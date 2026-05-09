@@ -547,17 +547,81 @@ h2 {
   font-weight: 800;
 }
 
+.opponent-mat .zone-grid {
+  direction: rtl;
+}
+
+.opponent-mat .zone-card {
+  direction: ltr;
+}
+
+.opponent-mat .base-lane {
+  flex-direction: row-reverse;
+}
+
+.opponent-mat .base-lane > span {
+  text-align: right;
+}
+
+.counter-zone {
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
 .zone-card span,
-.zone-card small {
+.zone-card small,
+.rune-bank span {
   display: block;
   color: var(--muted);
   font-size: 0.78rem;
 }
 
-.zone-card strong {
+.zone-card strong,
+.rune-bank strong {
   display: block;
   color: var(--text);
   font-size: 0.96rem;
+}
+
+.rune-bank {
+  display: grid;
+  gap: 0.45rem;
+  min-width: min(260px, 100%);
+}
+
+.rune-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+  min-height: 2.5rem;
+  align-items: center;
+}
+
+.rune-row.empty {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.rune-token {
+  display: inline-grid;
+  width: 2.1rem;
+  height: 3rem;
+  place-items: center;
+  border: 1px solid rgba(98, 216, 207, 0.62);
+  background: linear-gradient(160deg, rgba(98, 216, 207, 0.84), rgba(245, 241, 232, 0.7));
+  color: #081012;
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 900;
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+
+.rune-token.rested {
+  border-color: rgba(215, 174, 85, 0.72);
+  background: linear-gradient(160deg, rgba(215, 174, 85, 0.86), rgba(227, 93, 84, 0.56));
+  transform: rotate(90deg);
 }
 
 .base-lane {
@@ -650,6 +714,28 @@ h2 {
   background: linear-gradient(145deg, rgba(120, 201, 110, 0.9), rgba(98, 216, 207, 0.58));
 }
 
+.bench.rested,
+.rested-card {
+  border-color: rgba(215, 174, 85, 0.78);
+  background: linear-gradient(145deg, rgba(215, 174, 85, 0.9), rgba(227, 93, 84, 0.56));
+  color: #081012;
+}
+
+.bench.rested {
+  min-height: 86px;
+  margin: 1rem 0;
+  transform: rotate(90deg);
+  transform-origin: center;
+}
+
+.site-slot.rested-card {
+  min-height: 86px;
+  margin: 1rem auto;
+  transform: rotate(90deg);
+  transform-origin: center;
+  width: min(170px, 100%);
+}
+
 .site-slot.contested {
   border-color: rgba(227, 93, 84, 0.76);
   background: linear-gradient(145deg, rgba(227, 93, 84, 0.78), rgba(215, 174, 85, 0.54));
@@ -665,6 +751,10 @@ h2 {
   min-height: 140px;
   text-align: left;
   background: linear-gradient(145deg, rgba(215, 174, 85, 0.92), rgba(98, 216, 207, 0.62));
+}
+
+.hand-card.swift {
+  background: linear-gradient(145deg, rgba(227, 93, 84, 0.86), rgba(98, 216, 207, 0.62));
 }
 
 .hand-card span {
@@ -698,7 +788,7 @@ h2 {
 
 .rule-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -732,14 +822,16 @@ h2 {
 }
 
 .timeline,
-.combat-steps {
+.combat-steps,
+.timing-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
 }
 
 .timeline article,
-.combat-steps article {
+.combat-steps article,
+.timing-grid article {
   min-height: 230px;
   padding: 1.1rem;
   border: 1px solid var(--line);
@@ -747,15 +839,30 @@ h2 {
   background: rgba(18, 25, 32, 0.82);
 }
 
-.timeline span {
+.timeline span,
+.timing-grid span {
   display: grid;
-  width: 2rem;
-  height: 2rem;
+  width: fit-content;
+  min-width: 2rem;
+  min-height: 2rem;
   margin-bottom: 1.2rem;
+  padding: 0 0.65rem;
   place-items: center;
   border: 1px solid rgba(215, 174, 85, 0.6);
   color: var(--gold);
+  font-size: 0.82rem;
   font-weight: 900;
+}
+
+.timing-grid strong {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 1.05rem;
+}
+
+.timing-grid p {
+  margin: 0;
+  color: var(--muted);
 }
 
 .playmat {
@@ -877,6 +984,7 @@ h2 {
   .rule-grid,
   .timeline,
   .combat-steps,
+  .timing-grid,
   .battlefield-zone,
   .practice-topline,
   .battlefield-row,

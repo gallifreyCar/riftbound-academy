@@ -9,7 +9,7 @@
       content="像游戏新手教程一样学习英雄联盟卡牌游戏 Riftbound / 符文战场。"
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=5" />
+    <link rel="stylesheet" href="./styles.css?v=6" />
   </head>
   <body>
     <header class="topbar">
@@ -131,8 +131,8 @@
           <p class="eyebrow">Practice Match</p>
           <h2 id="practice-title">打一把脚本练习</h2>
           <p>
-            这一局串起新手必须先会的动作：拿符文、自动支付、打出单位、进入一处开放战场、征服得分、开始阶段据守，以及一次简化战斗。
-            目标不是模拟全部规则，而是让对局骨架真的动起来。
+            这一局从投骰、抽战场、起手调度开始，接着练符文横置支付、单位休眠进场、下回合激活后标准移动、迅捷/反应时机、征服、据守和一次战斗。
+            目标是让第一把牌的骨架按规则真的动起来。
           </p>
         </div>
         <div class="practice-shell">
@@ -146,7 +146,7 @@
               <strong id="practice-score">0 / 8</strong>
             </div>
             <div>
-              <span>可用资源</span>
+              <span>活跃符文</span>
               <strong id="practice-runes">0</strong>
             </div>
           </div>
@@ -155,16 +155,16 @@
             <section class="coach-panel" aria-labelledby="coach-title">
               <p class="eyebrow">Coach</p>
               <h3 id="coach-title">训练目标</h3>
-              <p id="coach-copy">点击“开始对局”，系统会发给你一个固定起手，让你按顺序打完第一轮。</p>
+              <p id="coach-copy">点击“开始准备”，从投骰决定先后手开始，按规则走完整个教学脚本。</p>
               <div class="practice-actions">
-                <button id="practice-primary">开始对局</button>
+                <button id="practice-primary">开始准备</button>
                 <button id="practice-undo" disabled>回退</button>
                 <button id="practice-reset">重开</button>
               </div>
             </section>
 
             <section class="practice-board" aria-label="练习战场区域">
-              <div class="duel-zone player-mat opponent-row">
+              <div class="duel-zone player-mat opponent-row opponent-mat">
                 <div class="mat-title">
                   <span>对手镜像区域</span>
                   <strong>传奇区 / 英雄区 / 牌堆 / 基地</strong>
@@ -180,11 +180,11 @@
                     <strong>亚索 - 选定英雄</strong>
                     <small>身子：同名英雄单位牌，可按规则打出</small>
                   </div>
-                  <div class="zone-card" id="opponent-main-deck">主牌堆 40</div>
-                  <div class="zone-card" id="opponent-rune-deck">符文牌堆 12</div>
-                  <div class="zone-card" id="opponent-discard">废牌堆 0</div>
-                  <div class="zone-card" id="opponent-banish">放逐区 0</div>
-                  <div class="zone-card" id="opponent-hand-count">手牌 0</div>
+                  <div class="zone-card counter-zone" id="opponent-main-deck">主牌堆 40</div>
+                  <div class="zone-card counter-zone" id="opponent-rune-deck">符文牌堆 12</div>
+                  <div class="zone-card counter-zone" id="opponent-discard">废牌堆 0</div>
+                  <div class="zone-card counter-zone" id="opponent-banish">放逐区 0</div>
+                  <div class="zone-card counter-zone" id="opponent-hand-count">手牌 0</div>
                 </div>
                 <div class="base-lane">
                   <span>对手基地</span>
@@ -228,11 +228,11 @@
                     <strong>金克丝 - 反抗者</strong>
                     <small>身子：同名英雄单位牌，可按规则打出</small>
                   </div>
-                  <div class="zone-card" id="player-main-deck">主牌堆 40</div>
-                  <div class="zone-card" id="player-rune-deck">符文牌堆 12</div>
-                  <div class="zone-card" id="player-discard">废牌堆 0</div>
-                  <div class="zone-card" id="player-banish">放逐区 0</div>
-                  <div class="zone-card" id="player-hand-count">手牌 0</div>
+                  <div class="zone-card counter-zone" id="player-main-deck">主牌堆 40</div>
+                  <div class="zone-card counter-zone" id="player-rune-deck">符文牌堆 12</div>
+                  <div class="zone-card counter-zone" id="player-discard">废牌堆 0</div>
+                  <div class="zone-card counter-zone" id="player-banish">放逐区 0</div>
+                  <div class="zone-card counter-zone" id="player-hand-count">手牌 0</div>
                 </div>
                 <span>你的基地</span>
                 <div class="bench" id="player-bench">等待发牌</div>
@@ -245,7 +245,7 @@
               <h3 id="hand-title">你的手牌与区域</h3>
               <div class="practice-hand" id="practice-hand"></div>
               <div class="zone-summary" aria-label="区域提醒">
-                <p>主牌堆、符文牌堆、废牌堆、放逐区都各自独立。符文是 12 张符文牌堆，不是主牌堆的一部分。</p>
+                <p>主牌堆、符文牌堆、废牌堆、放逐区都各自独立。符文是 12 张符文牌；横置后仍在基地，直到效果让它回收。</p>
               </div>
               <ol class="practice-log" id="practice-log" aria-label="行动日志"></ol>
             </aside>
@@ -265,28 +265,50 @@
             <span>Start</span>
             <h3>开局准备</h3>
             <ul>
-              <li>准备传奇、主牌堆、符文牌堆和战场。</li>
-              <li>1v1 决斗每名玩家从 3 个战场中随机选 1 个，同时放入战场区域。</li>
-              <li>传奇进传奇区，选定英雄进英雄区，双方各抽 4 张后调度最多 2 张。</li>
+              <li>传奇放入传奇区，选定英雄放入英雄区，主牌堆与 12 张符文牌堆分别洗切放置。</li>
+              <li>1v1 每名玩家提供 3 个战场，准备时随机选 1 个；两张选定战场同时放入战场区域。</li>
+              <li>用公平随机方式决定起始玩家。双方各抽 4 张，按回合顺序调度最多 2 张。</li>
+              <li>第二个行动的玩家，其首个召出阶段额外召出 1 张符文。</li>
             </ul>
           </article>
           <article class="rule-card">
             <span>Terms</span>
             <h3>关键名词</h3>
             <ul>
-              <li>基地：你的单位、装备和符文通常所在的位置。</li>
-              <li>符文池：本回合临时资源，会在抽牌阶段结束和回合结束时清空。</li>
-              <li>战场区域：放置多处战场。每处战场都是一个位置，不属于任何玩家的基地。</li>
-              <li>待命区域：控制某战场后，才可以把带待命的牌面朝下布置到那处战场。</li>
+              <li>传奇区：英雄的“头”，放传奇卡，提供符文特性与被动/主动效果。</li>
+              <li>英雄区：英雄的“身子”，放同名选定英雄单位牌，可从这里按规则打出。</li>
+              <li>基地：你的单位、装备和已召出的符文通常所在的位置。</li>
+              <li>符文池：临时法力/符能记录；抽牌阶段结束和回合结束时清空。</li>
+              <li>战场区域：只放 2 个战场；每个战场是单独位置，提供者不等于控制者。</li>
+            </ul>
+          </article>
+          <article class="rule-card">
+            <span>Ready</span>
+            <h3>活跃与休眠</h3>
+            <ul>
+              <li>单位默认以休眠状态进场，横置表示；有急速等效果才可能改变进场状态。</li>
+              <li>标准移动的费用是让该单位休眠，所以已经休眠的单位不能支付这项费用。</li>
+              <li>你的开始阶段会将你控制的非法术游戏物体激活，也就是正放。</li>
+              <li>符文使用其获得资源技能时也会横置；横置符文不能再次横置支付。</li>
             </ul>
           </article>
           <article class="rule-card">
             <span>Field</span>
             <h3>战场状态</h3>
             <ul>
-              <li>提供者不等于控制者。战场由某玩家带入游戏，但控制权在对局中会变化。</li>
               <li>被占领：战场上有单位。开放：未被占领且未受控制。</li>
               <li>争夺：不控制该战场的玩家让单位进入此处，直到对决或战斗后重新确立控制。</li>
+              <li>移动到开放战场通常开启非战斗法术对决；同一战场出现敌对单位会开启战斗。</li>
+            </ul>
+          </article>
+          <article class="rule-card">
+            <span>Timing</span>
+            <h3>法术时机</h3>
+            <ul>
+              <li>普通开环：主阶段默认可以打牌、用技能、标准移动。</li>
+              <li>闭环：结算链存在，只有反应能插入响应。</li>
+              <li>法术对决开环：只有迅捷或反应能打出/激活，并由拥有焦点的玩家行动。</li>
+              <li>法术对决闭环：同时处于对决和结算链中，只剩反应能响应。</li>
             </ul>
           </article>
           <article class="rule-card">
@@ -310,22 +332,57 @@
           <article>
             <span>1</span>
             <h3>回合开始</h3>
-            <p>唤醒自己的可激活物体，然后在开始阶段处理触发，并据守已经控制的战场。</p>
+            <p>激活自己控制的非法术游戏物体，处理开始阶段触发，并在得分计算步骤据守已控制战场。</p>
           </article>
           <article>
             <span>2</span>
             <h3>召出与抽牌</h3>
-            <p>从符文牌堆召出 2 张符文，再抽 1 张牌。第二行动玩家的首个召出阶段会额外召出 1 张符文。</p>
+            <p>从符文牌堆召出 2 张符文，再抽 1 张牌。第二行动玩家的首个召出阶段额外召出 1 张符文。</p>
           </article>
           <article>
             <span>3</span>
             <h3>主阶段行动</h3>
-            <p>打出牌、激活技能、使用标准移动。单位从基地去战场，或从战场回基地；有游走才可战场到战场。</p>
+            <p>普通开环时打出牌、激活技能、使用标准移动。单位从基地去战场，或从战场回基地；有游走才可战场到战场。</p>
           </article>
           <article>
             <span>4</span>
             <h3>对决与战斗</h3>
-            <p>单位进入开放战场会进入非战斗法术对决；同一战场出现敌对单位时进入战斗。</p>
+            <p>单位进入开放战场会开启非战斗法术对决；同一战场出现敌对单位时进入战斗法术对决。</p>
+          </article>
+          <article>
+            <span>5</span>
+            <h3>回合结束</h3>
+            <p>清空符文池；伤害会在回合结束或战斗清理等规则指定时机移除。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section timing-section" aria-labelledby="timing-title">
+        <div class="section-heading">
+          <p class="eyebrow">Priority Windows</p>
+          <h2 id="timing-title">迅捷、反应和优先行动权</h2>
+          <p>先看回合是否在法术对决或战斗中，再看是否有结算链。两个维度叠起来，决定谁能打什么。</p>
+        </div>
+        <div class="timing-grid" aria-label="四种时机窗口">
+          <article>
+            <span>普通开环</span>
+            <strong>主阶段的正常窗口</strong>
+            <p>回合玩家拥有优先行动权时，默认可以打出卡牌、激活技能、进行标准移动。</p>
+          </article>
+          <article>
+            <span>普通闭环</span>
+            <strong>有结算链</strong>
+            <p>有人打牌或用技能后进入闭环。此时默认不能继续普通行动，只有反应能加入结算链。</p>
+          </article>
+          <article>
+            <span>法术对决开环</span>
+            <strong>有焦点</strong>
+            <p>正在争夺或战斗。拥有焦点的玩家可以打迅捷或反应；让过后焦点按顺序传递。</p>
+          </article>
+          <article>
+            <span>法术对决闭环</span>
+            <strong>对决中有结算链</strong>
+            <p>此时限制最严，只能用反应响应。结算链按后进先出结算，清空后回到开环。</p>
           </article>
         </div>
       </section>
@@ -339,12 +396,12 @@
           <article>
             <span>01</span>
             <h3>进入争夺</h3>
-            <p>单位移动到自己不控制的战场，会让该战场进入争夺。若有敌对单位在场，就会标记待发生战斗。</p>
+            <p>单位移动到自己不控制的战场，会让该战场进入争夺。移动本身不使用结算链，也不能被直接反应。</p>
           </article>
           <article>
             <span>02</span>
             <h3>战斗法术对决</h3>
-            <p>确定进攻方和防守方。令战场进入争夺的玩家是进攻方，并先获得焦点。</p>
+            <p>若同一战场有敌对单位，确定进攻方和防守方。令战场进入争夺的玩家是进攻方，并先获得焦点。</p>
           </article>
           <article>
             <span>03</span>
@@ -403,7 +460,7 @@
           <a href="https://riftbound.leagueoflegends.com/en-us/news/rules-and-releases/how-to-play-get-started/" target="_blank" rel="noreferrer">Quick Start Guide</a>
           和
           <a href="https://riftbound.leagueoflegends.com/en-us/rules-hub/" target="_blank" rel="noreferrer">Rules Hub</a>。
-          本次练习对局按你提供的《符文战场》核心规则 2026-03-30 中文版校正：1v1 战场数量为 2，获胜得分为 8，并使用征服 / 据守得分方式。
+          本次练习对局按你提供的《符文战场》核心规则 2026-03-30 中文版校正：1v1 战场数量为 2，获胜得分为 8，并使用投骰/随机先后手、随机战场、休眠/激活、迅捷/反应、征服 / 据守和 Combat 步骤。
         </p>
       </section>
     </main>
@@ -412,6 +469,6 @@
       <p>卡牌训练场 · 为 GitHub Pages 准备的静态教学站</p>
     </footer>
 
-    <script src="./app.js?v=5"></script>
+    <script src="./app.js?v=6"></script>
   </body>
 </html>

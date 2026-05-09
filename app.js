@@ -10,15 +10,15 @@ const missions = [
     tag: "任务 02",
     title: "用符文付款",
     copy:
-      "符文来自独立的符文牌堆。每回合拿到两张新符文，普通费用可以横置支付，更重的费用可能要把符文放回牌堆。",
-    cards: ["Rune +1", "Rune +1", "Pay Cost"],
+      "符文来自独立的 12 张符文牌堆。召出后它们在基地里，横置自己的获得资源技能来支付费用；横置后本回合不能再用同一张符文。",
+    cards: ["符文牌堆", "活跃符文", "横置支付"],
   },
   {
     tag: "任务 03",
     title: "派单位上战场",
     copy:
-      "1v1 构筑对局有 2 张战场卡，它们都在战场区域里。战场的提供者不等于控制者；你可以控制对手提供的战场，对手也可以夺回你控制的战场。",
-    cards: ["Field A", "Field B", "Control"],
+      "单位默认以休眠状态进场，不能立刻支付标准移动费用。到你的开始阶段激活后，才能休眠它并从基地移动到战场。",
+    cards: ["休眠进场", "激活", "标准移动"],
   },
   {
     tag: "任务 04",
@@ -76,14 +76,16 @@ const initialPractice = {
   score: 0,
   runes: 0,
   bench: "等待发牌",
+  benchState: "empty",
   playerMainDeck: 40,
   playerRuneDeck: 12,
-  playerRuneBank: 0,
+  playerRunes: [],
   playerDiscard: 0,
   playerBanish: 0,
+  playerHandCountOverride: 0,
   opponentMainDeck: 40,
   opponentRuneDeck: 12,
-  opponentRuneBank: 0,
+  opponentRunes: [],
   opponentDiscard: 0,
   opponentBanish: 0,
   opponentHand: 0,
@@ -94,8 +96,8 @@ const initialPractice = {
   },
   hand: [],
   log: [],
-  coach: "点击“开始对局”，先看桌面区域：传奇区是英雄的“头”，英雄区是选定英雄这张同名单位牌，符文牌堆是独立 12 张。",
-  primary: "开始对局",
+  coach: "点击“开始准备”，先投骰决定起始玩家，再随机抽出双方各 1 张战场。",
+  primary: "开始准备",
 };
 
 const practiceCards = [
@@ -103,15 +105,77 @@ const practiceCards = [
     id: "scout",
     name: "皮城侦察兵",
     cost: 1,
-    text: "2 力单位。适合进入开放战场建立控制。",
+    text: "2 力单位。打出后先休眠进基地。",
   },
   {
     id: "trick",
     name: "精准指令",
     cost: 1,
-    text: "练习牌：本局先别打，保留给下回合。",
+    speed: "swift",
+    text: "迅捷练习牌。法术对决开环时才演示。",
   },
 ];
+
+function makeRunes(prefix, count, state = "active") {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `${prefix}-${index + 1}`,
+    state,
+  }));
+}
+
+function countRunes(runes, state) {
+  return runes.filter((rune) => rune.state === state).length;
+}
+
+function renderRuneBank(runes, label) {
+  if (runes.length === 0) {
+    return `
+      <span>${label}</span>
+      <strong>已召出符文 0</strong>
+      <div class="rune-row empty">无符文在场</div>
+    `;
+  }
+
+  const active = countRunes(runes, "active");
+  const rested = countRunes(runes, "rested");
+  const tokens = runes
+    .map((rune, index) => {
+      const stateText = rune.state === "active" ? "活跃" : "休眠";
+      return `<i class="rune-token ${rune.state}" title="符文 ${index + 1}：${stateText}">${stateText}</i>`;
+    })
+    .join("");
+
+  return `
+    <span>${label}</span>
+    <strong>活跃 ${active} / 休眠 ${rested}</strong>
+    <div class="rune-row">${tokens}</div>
+  `;
+}
+
+function refreshAvailableRunes() {
+  practice.runes = countRunes(practice.playerRunes, "active");
+}
+
+function restPlayerRunes(count) {
+  let remaining = count;
+  practice.playerRunes = practice.playerRunes.map((rune) => {
+    if (remaining > 0 && rune.state === "active") {
+      remaining -= 1;
+      return { ...rune, state: "rested" };
+    }
+    return rune;
+  });
+  refreshAvailableRunes();
+}
+
+function readyAllControlledObjects() {
+  practice.playerRunes = practice.playerRunes.map((rune) => ({ ...rune, state: "active" }));
+  if (practice.benchState === "rested") {
+    practice.benchState = "ready";
+    practice.bench = "皮城侦察兵 2 力 · 活跃";
+  }
+  refreshAvailableRunes();
+}
 
 let practice = structuredClone(initialPractice);
 let practiceHistory = [];
@@ -164,26 +228,27 @@ function addPracticeLog(text) {
 function renderPractice() {
   practicePhase.textContent = practice.phase;
   practiceScore.textContent = `${practice.score} / 8`;
+  refreshAvailableRunes();
   practiceRunes.textContent = practice.runes;
   coachCopy.textContent = practice.coach;
   practicePrimary.textContent = practice.primary;
   practiceUndo.disabled = practiceHistory.length === 0;
 
   playerBench.textContent = practice.bench;
-  playerBench.classList.toggle("ready", practice.bench !== "等待发牌" && practice.bench !== "空");
+  playerBench.className = `bench ${practice.benchState}`;
   enemyCard.classList.toggle("hidden", !practice.enemyVisible);
   zoneCounters.playerMainDeck.textContent = `主牌堆 ${practice.playerMainDeck}`;
   zoneCounters.playerRuneDeck.textContent = `符文牌堆 ${practice.playerRuneDeck}`;
   zoneCounters.playerDiscard.textContent = `废牌堆 ${practice.playerDiscard}`;
   zoneCounters.playerBanish.textContent = `放逐区 ${practice.playerBanish}`;
-  zoneCounters.playerHandCount.textContent = `手牌 ${practice.hand.length}`;
-  zoneCounters.playerRuneBank.textContent = `已召出符文 ${practice.playerRuneBank}`;
+  zoneCounters.playerHandCount.textContent = `手牌 ${practice.hand.length + practice.playerHandCountOverride}`;
+  zoneCounters.playerRuneBank.innerHTML = renderRuneBank(practice.playerRunes, "你的符文");
   zoneCounters.opponentMainDeck.textContent = `主牌堆 ${practice.opponentMainDeck}`;
   zoneCounters.opponentRuneDeck.textContent = `符文牌堆 ${practice.opponentRuneDeck}`;
   zoneCounters.opponentDiscard.textContent = `废牌堆 ${practice.opponentDiscard}`;
   zoneCounters.opponentBanish.textContent = `放逐区 ${practice.opponentBanish}`;
   zoneCounters.opponentHandCount.textContent = `手牌 ${practice.opponentHand}`;
-  zoneCounters.opponentRuneBank.textContent = `已召出符文 ${practice.opponentRuneBank}`;
+  zoneCounters.opponentRuneBank.innerHTML = renderRuneBank(practice.opponentRunes, "对手符文");
 
   Object.entries(siteEls).forEach(([site, element]) => {
     element.slot.textContent = practice.sites[site].text;
@@ -194,7 +259,7 @@ function renderPractice() {
   practiceHand.innerHTML = practice.hand
     .map(
       (card) => `
-        <button class="hand-card" data-card="${card.id}" ${practice.step !== 3 ? "disabled" : ""}>
+        <button class="hand-card ${card.speed || ""}" data-card="${card.id}" ${practice.step !== 4 ? "disabled" : ""}>
           ${card.name}
           <span>费用 ${card.cost} · ${card.text}</span>
         </button>
@@ -210,100 +275,139 @@ function advancePractice() {
 
   if (practice.step === 0) {
     practice.step = 1;
+    practice.phase = "投骰";
+    practice.primary = "抽取战场";
+    practice.coach = "用公平随机方式决定回合顺序。脚本里你投出高点并成为起始玩家；第二个行动的玩家会在自己首个召出阶段额外召出 1 张符文。";
+    addPracticeLog("投骰：你获得先手。对手作为第二行动玩家，首个召出阶段会额外召出 1 张符文。");
+  } else if (practice.step === 1) {
+    practice.step = 2;
+    practice.phase = "抽战场";
+    practice.primary = "布置起手";
+    practice.coach = "1v1 决斗每名玩家从自己提供的 3 个战场里随机选 1 个。两张战场同时放入同一个战场区域，而不是上中下三路。";
+    addPracticeLog("抽战场：你抽到荣耀竞技场，对手抽到河道渡口，剩余战场移出本局。");
+  } else if (practice.step === 2) {
+    practice.step = 3;
     practice.phase = "开局";
     practice.playerMainDeck = 38;
     practice.opponentMainDeck = 36;
     practice.opponentHand = 4;
+    practice.playerHandCountOverride = 2;
     practice.hand = structuredClone(practiceCards);
     practice.primary = "进入召出阶段";
-    practice.coach = "开局双方各抽 4 张并调度；这里给你保留 2 张可操作手牌。传奇区的金克丝是“头”，英雄区的金克丝单位牌是可打出的“身子”。";
-    addPracticeLog("开局：传奇进传奇区，选定英雄进英雄区；双方抽牌并调度。");
-  } else if (practice.step === 1) {
-    practice.step = 2;
-    practice.phase = "资源";
-    practice.runes = 2;
+    practice.coach = "传奇进传奇区，选定英雄进英雄区。双方主牌堆和符文牌堆洗切，各抽 4 张并按回合顺序调度最多 2 张；这里把另外两张手牌折叠成数量显示。";
+    addPracticeLog("开局：传奇、英雄、主牌堆、符文牌堆放入各自区域；双方抽 4 并调度最多 2。");
+  } else if (practice.step === 3) {
+    practice.step = 4;
+    practice.phase = "召出";
     practice.playerRuneDeck = 10;
-    practice.playerRuneBank = 2;
-    practice.primary = "确认拿符文";
-    practice.coach = "召出阶段从符文牌堆召出 2 张符文。下一步打出 1 费单位，系统会自动支付。";
-    addPracticeLog("召出：从 12 张符文牌堆召出 2 张，符文牌堆剩 10。");
-  } else if (practice.step === 2) {
-    practice.step = 3;
-    practice.phase = "部署";
+    practice.playerRunes = makeRunes("player", 2);
+    refreshAvailableRunes();
     practice.primary = "等待出牌";
-    practice.coach = "点击手牌里的“皮城侦察兵”。先别打指令牌，练习目标是让单位进入一处开放战场。";
-    addPracticeLog("资源确认：这回合可以支付 2 点费用。");
+    practice.coach = "召出阶段从符文牌堆召出 2 张符文，它们以活跃状态在基地里。点击手牌里的“皮城侦察兵”，会横置 1 张符文支付费用。";
+    addPracticeLog("召出：从 12 张符文牌堆召出 2 张符文，放入基地并保持活跃。");
   } else if (practice.step === 4) {
     practice.step = 5;
-    practice.phase = "行动";
-    practice.primary = "移动到战场 B";
-    practice.coach = "单位已经在你的基地。现在把它移动到战场 B。战场 B 由对手提供，但当前开放且未受控制。";
-    addPracticeLog("部署完成：皮城侦察兵进入你的基地。");
+    practice.phase = "部署后";
+    practice.primary = "结束本回合";
+    practice.coach = "单位默认休眠进场，所以它这回合不能支付标准移动费用。把它留在你的基地，等下一次你的开始阶段激活。";
+    addPracticeLog("部署检查：皮城侦察兵以休眠状态进场，不能立刻标准移动。");
   } else if (practice.step === 5) {
     practice.step = 6;
-    practice.phase = "法术对决";
-    practice.primary = "确立控制";
-    practice.bench = "空";
-    practice.sites.bridge = {
-      text: "你的皮城侦察兵 2 力",
-      state: "controlled",
-      status: "被占领 · 争夺待结算",
-    };
-    practice.coach = "移动到开放战场会让该战场进入争夺，并开启非战斗法术对决。无人防守时，对决后你会建立控制。";
-    addPracticeLog("移动：皮城侦察兵进入战场 B。该战场进入争夺，开启非战斗法术对决。");
+    practice.phase = "对手首回合";
+    practice.primary = "进入你的开始阶段";
+    practice.opponentRuneDeck = 9;
+    practice.opponentRunes = makeRunes("opponent", 3);
+    practice.coach = "对手是第二个行动的玩家，因此首个召出阶段召出 3 张符文：基础 2 张，加上首回合流程额外 1 张。这里对手暂不进攻，让你练到下回合激活。";
+    addPracticeLog("对手首回合：第二行动玩家首个召出阶段额外召出 1 张符文，共 3 张。");
   } else if (practice.step === 6) {
     practice.step = 7;
+    practice.phase = "你的开始阶段";
+    practice.primary = "标准移动";
+    readyAllControlledObjects();
+    practice.coach = "开始阶段的激活步骤把你控制的非法术游戏物体激活：休眠单位正放，横置符文也正放。现在侦察兵可以支付标准移动费用。";
+    addPracticeLog("激活：你的休眠单位和休眠符文变为活跃。");
+  } else if (practice.step === 7) {
+    practice.step = 8;
+    practice.phase = "主阶段";
+    practice.primary = "开启法术对决";
+    practice.bench = "空";
+    practice.benchState = "empty";
+    practice.sites.bridge = {
+      text: "皮城侦察兵 2 力 · 休眠",
+      state: "controlled rested-card",
+      status: "被占领 · 争夺待结算",
+    };
+    practice.coach = "标准移动的费用是让单位休眠。侦察兵从你的基地移动到战场 B 后横置，战场进入争夺，并标记一场非战斗法术对决。";
+    addPracticeLog("标准移动：侦察兵休眠作为费用，从基地移动到战场 B。");
+  } else if (practice.step === 8) {
+    practice.step = 9;
+    practice.phase = "法术对决";
+    practice.primary = "让过并确立控制";
+    practice.coach = "现在处于法术对决开环。只有带迅捷或反应的法术/技能能在这里打出或激活；如果有结算链，就会变成闭环，只剩反应能继续响应。双方都让过后，对决关闭。";
+    addPracticeLog("法术对决：移动到开放战场后开启。焦点从令战场进入争夺的玩家开始。");
+  } else if (practice.step === 9) {
+    practice.step = 10;
     practice.phase = "征服";
     practice.primary = "结算得分";
     practice.sites.bridge = {
-      text: "你的皮城侦察兵 2 力",
-      state: "controlled",
+      text: "皮城侦察兵 2 力 · 休眠",
+      state: "controlled rested-card",
       status: "被占领 · 控制者：你",
     };
-    practice.coach = "法术对决结束后，你在战场 B 有单位，因此建立控制。因为本回合尚未通过此战场得分，这会导致一次征服。";
+    practice.coach = "非战斗法术对决结束后，如果只剩你的单位在该战场，你确立控制。因为本回合还没有通过这个战场得分，所以这次控制变化视为征服。";
     addPracticeLog("控制：你建立对战场 B 的控制。提供者仍是对手，但控制者现在是你。");
-  } else if (practice.step === 7) {
-    practice.step = 8;
+  } else if (practice.step === 10) {
+    practice.step = 11;
     practice.phase = "得分";
     practice.primary = "进入下回合";
     practice.score = 1;
     practice.coach = "征服会让你获得最多 1 分，并触发该战场上的征服技能。下一回合如果仍控制此战场，就能据守得分。";
     addPracticeLog("征服：通过战场 B 得 1 分。");
-  } else if (practice.step === 8) {
-    practice.step = 9;
+  } else if (practice.step === 11) {
+    practice.step = 12;
     practice.phase = "开始阶段";
     practice.primary = "对手行动";
+    practice.sites.bridge = {
+      text: "皮城侦察兵 2 力 · 活跃",
+      state: "controlled",
+      status: "被占领 · 控制者：你",
+    };
     practice.score = 2;
-    practice.coach = "你的开始阶段得分计算步骤中，你仍控制战场 B，因此通过据守得 1 分。";
+    readyAllControlledObjects();
+    practice.coach = "又到你的开始阶段，单位会激活。得分计算步骤中，你仍控制战场 B，因此通过据守得 1 分。";
     addPracticeLog("据守：开始阶段仍控制战场 B，得 1 分。");
-  } else if (practice.step === 9) {
-    practice.step = 10;
+  } else if (practice.step === 12) {
+    practice.step = 13;
     practice.phase = "对手";
     practice.primary = "开始战斗";
     practice.enemyVisible = false;
-    practice.opponentRuneDeck = 10;
-    practice.opponentRuneBank = 2;
     practice.sites.bridge = {
-      text: "你的侦察兵防守 / 敌方单位进攻",
+      text: "防守：侦察兵 2 力 / 进攻：敌方单位 2 力",
       state: "contested",
       status: "被占领 · 正在争夺",
     };
     practice.coach = "对手让单位进入你控制的战场 B。因为同一战场出现敌对单位，战场进入争夺并标记待发生战斗。";
     addPracticeLog("对手行动：敌方单位进入战场 B。该战场进入争夺，并待发生战斗。");
-  } else if (practice.step === 10) {
-    practice.step = 11;
+  } else if (practice.step === 13) {
+    practice.step = 14;
     practice.phase = "战斗";
-    practice.primary = "分配伤害";
-    practice.coach = "战斗先进入战斗法术对决：令战场进入争夺的对手是进攻方，你是防守方。";
+    practice.primary = "迅捷窗口让过";
+    practice.coach = "战斗先进入战斗法术对决。令战场进入争夺的对手是进攻方，并先获得焦点；在这个开环窗口，迅捷与反应都可以用。";
     addPracticeLog("战斗法术对决：确定进攻方与防守方。");
-  } else if (practice.step === 11) {
-    practice.step = 12;
+  } else if (practice.step === 14) {
+    practice.step = 15;
+    practice.phase = "结算链";
+    practice.primary = "反应窗口让过";
+    practice.coach = "假设对手打出一张迅捷法术，它进入结算链。此时从法术对决开环变成法术对决闭环，只有反应能继续响应；普通法术和标准移动都不能插进来。";
+    addPracticeLog("时机：迅捷法术创建结算链；闭环状态只允许反应。");
+  } else if (practice.step === 15) {
+    practice.step = 16;
     practice.phase = "伤害";
     practice.primary = "判定结果";
     practice.coach = "双方各有 2 点战力，互相分配 2 点战斗伤害，然后同时造成。";
     addPracticeLog("战斗伤害：双方各分配并造成 2 点伤害。");
-  } else if (practice.step === 12) {
-    practice.step = 13;
+  } else if (practice.step === 16) {
+    practice.step = 17;
     practice.phase = "结算";
     practice.primary = "完成练习";
     practice.sites.bridge = {
@@ -318,7 +422,7 @@ function advancePractice() {
   } else {
     practice.phase = "完成";
     practice.primary = "再打一把";
-    practice.coach = "你已经跑完资源、部署、移动、征服、据守和一次简化战斗。现在可以重开再熟一遍。";
+    practice.coach = "你已经跑完投骰、抽战场、召出符文、横置支付、休眠进场、激活后标准移动、迅捷/反应窗口、征服、据守和一次战斗。现在可以重开再熟一遍。";
     addPracticeLog("练习完成：对局核心骨架已经跑通。");
     practice.step = 0;
   }
@@ -327,30 +431,30 @@ function advancePractice() {
 }
 
 function playPracticeCard(cardId) {
-  if (practice.step !== 3) {
+  if (practice.step !== 4) {
     return;
   }
 
   if (cardId !== "scout") {
-    practice.coach = "这张牌先留着。现在要练的是打出单位并进入开放战场。";
+    practice.coach = "这张牌先留着。现在要练的是打出单位、横置符文付款，并确认单位休眠进场。";
     renderPractice();
     return;
   }
 
   savePractice();
   practice.step = 4;
-  practice.runes -= 1;
-  practice.playerRuneBank = 1;
+  restPlayerRunes(1);
   practice.hand = practice.hand.filter((card) => card.id !== cardId);
-  practice.bench = "皮城侦察兵 2 力";
-  practice.primary = "完成部署";
-  practice.coach = "自动支付 1 个符文，单位进入你的基地。下一步点击“完成部署”。";
-  addPracticeLog("自动支付：横置 1 个符文，打出皮城侦察兵。");
+  practice.bench = "皮城侦察兵 2 力 · 休眠";
+  practice.benchState = "rested";
+  practice.primary = "检查休眠";
+  practice.coach = "自动横置 1 张活跃符文获得资源并支付费用。皮城侦察兵打出到你的基地，并以休眠状态进场，所以本回合不能标准移动。";
+  addPracticeLog("支付：横置 1 张符文获得 1 点资源，并打出皮城侦察兵到基地。");
   renderPractice();
 }
 
 practicePrimary.addEventListener("click", () => {
-  if (practice.step === 3) {
+  if (practice.step === 4 && practice.benchState !== "rested") {
     practice.coach = "先从手牌打出“皮城侦察兵”，再继续。";
     renderPractice();
     return;
