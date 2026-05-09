@@ -417,7 +417,9 @@ h2 {
 
 .practice-topline span,
 .duel-zone > span,
-.practice-site > span {
+.site-header span,
+.site-header small,
+.site-state {
   color: var(--muted);
   font-size: 0.82rem;
   font-weight: 800;
@@ -525,6 +527,23 @@ h2 {
 
 .practice-site:last-child {
   border-right: 0;
+}
+
+.site-header {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.site-header strong {
+  font-size: 1.15rem;
+}
+
+.site-state {
+  min-height: 2rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgba(215, 174, 85, 0.26);
+  background: rgba(215, 174, 85, 0.08);
+  color: var(--gold);
 }
 
 .site-slot,

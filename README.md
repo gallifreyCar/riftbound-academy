@@ -1,6 +1,6 @@
 # 卡牌训练场
 
-这是一个为 GitHub Pages 准备的纯静态教学站点。当前第一门课程是《符文战场 Riftbound》入门教学，包含规则讲解、关键名词、开局步骤、双方战场示意、脚本练习对局、战斗步骤和测验，后续可以继续添加其他卡牌游戏。
+这是一个为 GitHub Pages 准备的纯静态教学站点。当前第一门课程是《符文战场 Riftbound》入门教学，包含规则讲解、关键名词、开局步骤、战场区域示意、脚本练习对局、战斗步骤和测验，后续可以继续添加其他卡牌游戏。
 
 ## 本地预览
 
@@ -19,4 +19,4 @@
 - https://riftbound.leagueoflegends.com/en-us/news/rules-and-releases/how-to-play-get-started/
 - https://riftbound.leagueoflegends.com/en-us/rules-hub/
 - 用户提供的《符文战场》核心规则 2026-03-30 中文版。
-- Core Rules: 1v1 使用 Battlefield Count: 2，Victory Score: 8；练习对局按 Conquer / Hold 得分和 Combat 步骤校正。
+- Core Rules: 1v1 使用 Battlefield Count: 2，Victory Score: 8；练习对局按战场区域、战场提供者/控制者、Conquer / Hold 得分和 Combat 步骤校正。

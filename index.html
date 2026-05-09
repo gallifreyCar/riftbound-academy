@@ -9,7 +9,7 @@
       content="像游戏新手教程一样学习英雄联盟卡牌游戏 Riftbound / 符文战场。"
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=3" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
   </head>
   <body>
     <header class="topbar">
@@ -131,7 +131,7 @@
           <p class="eyebrow">Practice Match</p>
           <h2 id="practice-title">打一把脚本练习</h2>
           <p>
-            这一局串起新手必须先会的动作：拿符文、自动支付、打出单位、进攻对手战场、征服得分、开始阶段据守，以及一次简化战斗。
+            这一局串起新手必须先会的动作：拿符文、自动支付、打出单位、进入一处开放战场、征服得分、开始阶段据守，以及一次简化战斗。
             目标不是模拟全部规则，而是让对局骨架真的动起来。
           </p>
         </div>
@@ -163,23 +163,33 @@
               </div>
             </section>
 
-            <section class="practice-board" aria-label="练习战场">
+            <section class="practice-board" aria-label="练习战场区域">
               <div class="duel-zone opponent-row">
-                <span>对手后场</span>
+                <span>对手基地</span>
                 <div class="mini-card enemy-card" id="enemy-card">敌方单位 2 力</div>
               </div>
-              <div class="duel-zone battlefield-row">
-                <div class="practice-site" data-site="your">
-                  <span>你的战场</span>
-                  <div class="site-slot" id="site-your">空</div>
+              <div class="duel-zone battlefield-row" aria-label="战场区域">
+                <div class="practice-site" data-site="arena">
+                  <div class="site-header">
+                    <span>战场 A</span>
+                    <strong>荣耀竞技场</strong>
+                    <small>提供者：你</small>
+                  </div>
+                  <div class="site-state" id="state-arena">开放 · 未受控制</div>
+                  <div class="site-slot" id="site-arena">无单位</div>
                 </div>
-                <div class="practice-site" data-site="enemy">
-                  <span>对手战场</span>
-                  <div class="site-slot" id="site-enemy">空</div>
+                <div class="practice-site" data-site="bridge">
+                  <div class="site-header">
+                    <span>战场 B</span>
+                    <strong>河道渡口</strong>
+                    <small>提供者：对手</small>
+                  </div>
+                  <div class="site-state" id="state-bridge">开放 · 未受控制</div>
+                  <div class="site-slot" id="site-bridge">无单位</div>
                 </div>
               </div>
               <div class="duel-zone player-row">
-                <span>你的后场</span>
+                <span>你的基地</span>
                 <div class="bench" id="player-bench">等待发牌</div>
               </div>
             </section>
@@ -207,7 +217,7 @@
             <h3>开局准备</h3>
             <ul>
               <li>准备传奇、主牌堆、符文牌堆和战场。</li>
-              <li>1v1 决斗每名玩家从 3 个战场中随机选 1 个，本局共 2 个战场。</li>
+              <li>1v1 决斗每名玩家从 3 个战场中随机选 1 个，同时放入战场区域。</li>
               <li>传奇进传奇区，选定英雄进英雄区，双方各抽 4 张后调度最多 2 张。</li>
             </ul>
           </article>
@@ -217,16 +227,16 @@
             <ul>
               <li>基地：你的单位、装备和符文通常所在的位置。</li>
               <li>符文池：本回合临时资源，会在抽牌阶段结束和回合结束时清空。</li>
-              <li>待命区域：控制某战场后，才可以把带待命的牌面朝下布置到那里。</li>
+              <li>战场区域：放置多处战场。每处战场都是一个位置，不属于任何玩家的基地。</li>
+              <li>待命区域：控制某战场后，才可以把带待命的牌面朝下布置到那处战场。</li>
             </ul>
           </article>
           <article class="rule-card">
             <span>Field</span>
-            <h3>战场形态</h3>
+            <h3>战场状态</h3>
             <ul>
-              <li>被占领：战场上有单位。</li>
-              <li>未受控制：没有任何玩家控制该战场。</li>
-              <li>开放：未被占领且未受控制。</li>
+              <li>提供者不等于控制者。战场由某玩家带入游戏，但控制权在对局中会变化。</li>
+              <li>被占领：战场上有单位。开放：未被占领且未受控制。</li>
               <li>争夺：不控制该战场的玩家让单位进入此处，直到对决或战斗后重新确立控制。</li>
             </ul>
           </article>
@@ -266,7 +276,7 @@
           <article>
             <span>4</span>
             <h3>对决与战斗</h3>
-            <p>进攻开放战场会进入非战斗法术对决；同一战场出现敌对单位时进入战斗。</p>
+            <p>单位进入开放战场会进入非战斗法术对决；同一战场出现敌对单位时进入战斗。</p>
           </article>
         </div>
       </section>
@@ -305,19 +315,19 @@
           <p class="eyebrow">Battlefield Map</p>
           <h2 id="board-title">战场为什么重要</h2>
         </div>
-        <div class="playmat" aria-label="符文战场示意图">
-          <div class="zone player-zone">你的后场</div>
+        <div class="playmat" aria-label="符文战场区域示意图">
+          <div class="zone player-zone">你的基地</div>
           <div class="zone battlefield-zone">
             <div>
-              <strong>你的战场</strong>
-              <span>守住后可 Hold 得分</span>
+              <strong>战场 A</strong>
+              <span>提供者：你 · 控制者会变化</span>
             </div>
             <div>
-              <strong>对手战场</strong>
-              <span>攻下后可 Conquer 得分</span>
+              <strong>战场 B</strong>
+              <span>提供者：对手 · 控制者会变化</span>
             </div>
           </div>
-          <div class="zone opponent-zone">对手后场</div>
+          <div class="zone opponent-zone">对手基地</div>
         </div>
       </section>
 
@@ -353,6 +363,6 @@
       <p>卡牌训练场 · 为 GitHub Pages 准备的静态教学站</p>
     </footer>
 
-    <script src="./app.js?v=3"></script>
+    <script src="./app.js?v=4"></script>
   </body>
 </html>

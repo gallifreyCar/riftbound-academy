@@ -17,14 +17,14 @@ const missions = [
     tag: "任务 03",
     title: "派单位上战场",
     copy:
-      "1v1 构筑对局有 2 个战场：你的战场和对手战场。把单位移动到对手战场可以发起 Conquer；守住自己的战场，到下个开始阶段可以 Hold。",
-    cards: ["Your Field", "Enemy Field", "Conquer"],
+      "1v1 构筑对局有 2 张战场卡，它们都在战场区域里。战场的提供者不等于控制者；你可以控制对手提供的战场，对手也可以夺回你控制的战场。",
+    cards: ["Field A", "Field B", "Control"],
   },
   {
     tag: "任务 04",
     title: "抢到 8 分",
     copy:
-      "得分主要来自两种方式：攻下还没得过分的战场叫 Conquer；开始阶段继续控制战场叫 Hold。1v1 通常先到 8 分获胜。",
+      "得分主要来自两种方式：通过争夺建立战场控制叫 Conquer；开始阶段继续控制战场叫 Hold。1v1 通常先到 8 分获胜。",
     cards: ["Conquer", "Hold", "Win"],
   },
 ];
@@ -78,12 +78,12 @@ const initialPractice = {
   bench: "等待发牌",
   enemyVisible: false,
   sites: {
-    your: { text: "空", state: "" },
-    enemy: { text: "空", state: "" },
+    arena: { text: "无单位", state: "", status: "开放 · 未受控制" },
+    bridge: { text: "无单位", state: "", status: "开放 · 未受控制" },
   },
   hand: [],
   log: [],
-  coach: "点击“开始对局”，系统会发给你一个固定起手，让你按顺序打完第一轮，并看见据守和战斗。",
+  coach: "点击“开始对局”，系统会发给你一个固定起手。注意：两张战场都在战场区域里，不是各自的基地。",
   primary: "开始对局",
 };
 
@@ -92,7 +92,7 @@ const practiceCards = [
     id: "scout",
     name: "皮城侦察兵",
     cost: 1,
-    text: "2 力单位。适合进攻对手战场。",
+    text: "2 力单位。适合进入开放战场建立控制。",
   },
   {
     id: "trick",
@@ -117,8 +117,14 @@ const practiceLog = document.querySelector("#practice-log");
 const playerBench = document.querySelector("#player-bench");
 const enemyCard = document.querySelector("#enemy-card");
 const siteEls = {
-  your: document.querySelector("#site-your"),
-  enemy: document.querySelector("#site-enemy"),
+  arena: {
+    slot: document.querySelector("#site-arena"),
+    status: document.querySelector("#state-arena"),
+  },
+  bridge: {
+    slot: document.querySelector("#site-bridge"),
+    status: document.querySelector("#state-bridge"),
+  },
 };
 
 function savePractice() {
@@ -143,8 +149,9 @@ function renderPractice() {
   enemyCard.classList.toggle("hidden", !practice.enemyVisible);
 
   Object.entries(siteEls).forEach(([site, element]) => {
-    element.textContent = practice.sites[site].text;
-    element.className = `site-slot ${practice.sites[site].state}`;
+    element.slot.textContent = practice.sites[site].text;
+    element.slot.className = `site-slot ${practice.sites[site].state}`;
+    element.status.textContent = practice.sites[site].status;
   });
 
   practiceHand.innerHTML = practice.hand
@@ -176,61 +183,84 @@ function advancePractice() {
     practice.step = 2;
     practice.phase = "部署";
     practice.primary = "等待出牌";
-    practice.coach = "点击手牌里的“皮城侦察兵”。先别打指令牌，练习目标是派单位去对手战场发起 Conquer。";
+    practice.coach = "点击手牌里的“皮城侦察兵”。先别打指令牌，练习目标是让单位进入一处开放战场。";
     addPracticeLog("资源确认：这回合可以支付 2 点费用。");
   } else if (practice.step === 3) {
     practice.step = 4;
     practice.phase = "行动";
-    practice.primary = "进攻对手战场";
-    practice.coach = "单位已经在后场。现在把它派到对手战场。若对手没有单位防守，你会建立控制并通过 Conquer 得分。";
-    addPracticeLog("部署完成：皮城侦察兵进入你的后场。");
+    practice.primary = "移动到战场 B";
+    practice.coach = "单位已经在你的基地。现在把它移动到战场 B。战场 B 由对手提供，但当前开放且未受控制。";
+    addPracticeLog("部署完成：皮城侦察兵进入你的基地。");
   } else if (practice.step === 4) {
     practice.step = 5;
-    practice.phase = "战场";
-    practice.primary = "结算 Conquer";
+    practice.phase = "法术对决";
+    practice.primary = "确立控制";
     practice.bench = "空";
-    practice.sites.enemy = { text: "皮城侦察兵控制", state: "controlled" };
-    practice.coach = "对手战场没有单位防守，你建立控制。点击结算 Conquer，本回合拿到 1 分。";
-    addPracticeLog("移动：皮城侦察兵进入对手战场，发起争夺。");
+    practice.sites.bridge = {
+      text: "你的皮城侦察兵 2 力",
+      state: "controlled",
+      status: "被占领 · 争夺待结算",
+    };
+    practice.coach = "移动到开放战场会让该战场进入争夺，并开启非战斗法术对决。无人防守时，对决后你会建立控制。";
+    addPracticeLog("移动：皮城侦察兵进入战场 B。该战场进入争夺，开启非战斗法术对决。");
   } else if (practice.step === 5) {
     practice.step = 6;
+    practice.phase = "征服";
+    practice.primary = "结算得分";
+    practice.sites.bridge = {
+      text: "你的皮城侦察兵 2 力",
+      state: "controlled",
+      status: "被占领 · 控制者：你",
+    };
+    practice.coach = "法术对决结束后，你在战场 B 有单位，因此建立控制。因为本回合尚未通过此战场得分，这会导致一次征服。";
+    addPracticeLog("控制：你建立对战场 B 的控制。提供者仍是对手，但控制者现在是你。");
+  } else if (practice.step === 6) {
+    practice.step = 7;
     practice.phase = "得分";
     practice.primary = "进入下回合";
     practice.score = 1;
-    practice.coach = "你通过 Conquer 对手战场获得 1 分。只要下一次开始阶段仍控制它，就能通过 Hold 再得分。";
-    addPracticeLog("结算：Conquer 对手战场，得 1 分。");
-  } else if (practice.step === 6) {
-    practice.step = 7;
+    practice.coach = "征服会让你获得最多 1 分，并触发该战场上的征服技能。下一回合如果仍控制此战场，就能据守得分。";
+    addPracticeLog("征服：通过战场 B 得 1 分。");
+  } else if (practice.step === 7) {
+    practice.step = 8;
     practice.phase = "开始阶段";
     practice.primary = "对手行动";
     practice.score = 2;
-    practice.coach = "下一回合开始阶段，你仍控制对手战场，所以通过 Hold 得 1 分。";
-    addPracticeLog("据守：开始阶段仍控制对手战场，得 1 分。");
-  } else if (practice.step === 7) {
-    practice.step = 8;
+    practice.coach = "你的开始阶段得分计算步骤中，你仍控制战场 B，因此通过据守得 1 分。";
+    addPracticeLog("据守：开始阶段仍控制战场 B，得 1 分。");
+  } else if (practice.step === 8) {
+    practice.step = 9;
     practice.phase = "对手";
     practice.primary = "开始战斗";
     practice.enemyVisible = false;
-    practice.sites.enemy = { text: "皮城侦察兵防守 / 敌方单位进攻", state: "contested" };
-    practice.coach = "对手把单位移动到你控制的对手战场。同一战场出现敌对单位，战场进入争夺并标记待发生战斗。";
-    addPracticeLog("对手行动：敌方单位移动到你控制的战场，发起争夺。");
-  } else if (practice.step === 8) {
-    practice.step = 9;
+    practice.sites.bridge = {
+      text: "你的侦察兵防守 / 敌方单位进攻",
+      state: "contested",
+      status: "被占领 · 正在争夺",
+    };
+    practice.coach = "对手让单位进入你控制的战场 B。因为同一战场出现敌对单位，战场进入争夺并标记待发生战斗。";
+    addPracticeLog("对手行动：敌方单位进入战场 B。该战场进入争夺，并待发生战斗。");
+  } else if (practice.step === 9) {
+    practice.step = 10;
     practice.phase = "战斗";
     practice.primary = "分配伤害";
     practice.coach = "战斗先进入战斗法术对决：令战场进入争夺的对手是进攻方，你是防守方。";
     addPracticeLog("战斗法术对决：确定进攻方与防守方。");
-  } else if (practice.step === 9) {
-    practice.step = 10;
+  } else if (practice.step === 10) {
+    practice.step = 11;
     practice.phase = "伤害";
     practice.primary = "判定结果";
     practice.coach = "双方各有 2 点战力，互相分配 2 点战斗伤害，然后同时造成。";
     addPracticeLog("战斗伤害：双方各分配并造成 2 点伤害。");
-  } else if (practice.step === 10) {
-    practice.step = 11;
+  } else if (practice.step === 11) {
+    practice.step = 12;
     practice.phase = "结算";
     practice.primary = "完成练习";
-    practice.sites.enemy = { text: "双方单位被摧毁 / 战场未受控制", state: "" };
+    practice.sites.bridge = {
+      text: "无单位",
+      state: "",
+      status: "开放 · 未受控制",
+    };
     practice.coach = "双方单位都受到致命伤害，没有单位存活，所以战斗无结果，战场变为未受控制。";
     addPracticeLog("战斗结果：双方都没有单位存活，战斗无结果，战场未受控制。");
   } else {
@@ -250,7 +280,7 @@ function playPracticeCard(cardId) {
   }
 
   if (cardId !== "scout") {
-    practice.coach = "这张牌先留着。现在要练的是打出单位并进攻对手战场。";
+    practice.coach = "这张牌先留着。现在要练的是打出单位并进入开放战场。";
     renderPractice();
     return;
   }
@@ -261,7 +291,7 @@ function playPracticeCard(cardId) {
   practice.hand = practice.hand.filter((card) => card.id !== cardId);
   practice.bench = "皮城侦察兵 2 力";
   practice.primary = "完成部署";
-  practice.coach = "自动支付 1 个符文，单位进入后场。下一步点击“完成部署”。";
+  practice.coach = "自动支付 1 个符文，单位进入你的基地。下一步点击“完成部署”。";
   addPracticeLog("自动支付：横置 1 个符文，打出皮城侦察兵。");
   renderPractice();
 }
