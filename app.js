@@ -76,14 +76,14 @@ const initialPractice = {
   score: 0,
   runes: 0,
   bench: "等待发牌",
-  enemyVisible: true,
+  enemyVisible: false,
   sites: {
     your: { text: "空", state: "" },
     enemy: { text: "空", state: "" },
   },
   hand: [],
   log: [],
-  coach: "点击“开始对局”，系统会发给你一个固定起手，让你按顺序打完第一轮。",
+  coach: "点击“开始对局”，系统会发给你一个固定起手，让你按顺序打完第一轮，并看见据守和战斗。",
   primary: "开始对局",
 };
 
@@ -170,8 +170,8 @@ function advancePractice() {
     practice.runes = 2;
     practice.hand = structuredClone(practiceCards);
     practice.primary = "确认拿符文";
-    practice.coach = "你这回合获得 2 个可用符文。下一步先打出 1 费单位，系统会自动支付。";
-    addPracticeLog("起手：获得 2 个符文，并抽到两张练习牌。");
+    practice.coach = "召出阶段从符文牌堆召出 2 张符文。下一步打出 1 费单位，系统会自动支付。";
+    addPracticeLog("召出：获得 2 个符文，并抽到两张练习牌。");
   } else if (practice.step === 1) {
     practice.step = 2;
     practice.phase = "部署";
@@ -195,23 +195,49 @@ function advancePractice() {
   } else if (practice.step === 5) {
     practice.step = 6;
     practice.phase = "得分";
-    practice.primary = "对手行动";
+    practice.primary = "进入下回合";
     practice.score = 1;
-    practice.coach = "你通过 Conquer 对手战场获得 1 分。真实对局会继续轮流行动，目标是先到 8 分。";
+    practice.coach = "你通过 Conquer 对手战场获得 1 分。只要下一次开始阶段仍控制它，就能通过 Hold 再得分。";
     addPracticeLog("结算：Conquer 对手战场，得 1 分。");
   } else if (practice.step === 6) {
     practice.step = 7;
+    practice.phase = "开始阶段";
+    practice.primary = "对手行动";
+    practice.score = 2;
+    practice.coach = "下一回合开始阶段，你仍控制对手战场，所以通过 Hold 得 1 分。";
+    addPracticeLog("据守：开始阶段仍控制对手战场，得 1 分。");
+  } else if (practice.step === 7) {
+    practice.step = 8;
     practice.phase = "对手";
-    practice.primary = "完成练习";
+    practice.primary = "开始战斗";
     practice.enemyVisible = false;
-    practice.sites.your = { text: "敌方单位争夺", state: "contested" };
-    practice.coach = "对手也可以进攻你的战场。下一回合你要处理自己战场的争夺，或继续守住对手战场等 Hold。";
-    addPracticeLog("对手行动：敌方单位移动到你的战场，发起争夺。");
+    practice.sites.enemy = { text: "皮城侦察兵防守 / 敌方单位进攻", state: "contested" };
+    practice.coach = "对手把单位移动到你控制的对手战场。同一战场出现敌对单位，战场进入争夺并标记待发生战斗。";
+    addPracticeLog("对手行动：敌方单位移动到你控制的战场，发起争夺。");
+  } else if (practice.step === 8) {
+    practice.step = 9;
+    practice.phase = "战斗";
+    practice.primary = "分配伤害";
+    practice.coach = "战斗先进入战斗法术对决：令战场进入争夺的对手是进攻方，你是防守方。";
+    addPracticeLog("战斗法术对决：确定进攻方与防守方。");
+  } else if (practice.step === 9) {
+    practice.step = 10;
+    practice.phase = "伤害";
+    practice.primary = "判定结果";
+    practice.coach = "双方各有 2 点战力，互相分配 2 点战斗伤害，然后同时造成。";
+    addPracticeLog("战斗伤害：双方各分配并造成 2 点伤害。");
+  } else if (practice.step === 10) {
+    practice.step = 11;
+    practice.phase = "结算";
+    practice.primary = "完成练习";
+    practice.sites.enemy = { text: "双方单位被摧毁 / 战场未受控制", state: "" };
+    practice.coach = "双方单位都受到致命伤害，没有单位存活，所以战斗无结果，战场变为未受控制。";
+    addPracticeLog("战斗结果：双方都没有单位存活，战斗无结果，战场未受控制。");
   } else {
     practice.phase = "完成";
     practice.primary = "再打一把";
-    practice.coach = "你已经完成第一轮：资源、部署、移动、结算、观察对手行动。现在可以重开再熟一遍。";
-    addPracticeLog("练习完成：第一回合的骨架已经跑通。");
+    practice.coach = "你已经跑完资源、部署、移动、征服、据守和一次简化战斗。现在可以重开再熟一遍。";
+    addPracticeLog("练习完成：对局核心骨架已经跑通。");
     practice.step = 0;
   }
 

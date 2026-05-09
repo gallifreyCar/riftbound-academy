@@ -277,12 +277,15 @@ h2 {
 }
 
 .game-card h3,
-.timeline h3 {
+.timeline h3,
+.rule-card h3,
+.combat-steps h3 {
   margin: 0 0 0.3rem;
 }
 
 .game-card p,
 .timeline p,
+.combat-steps p,
 .source-note p {
   margin: 0;
   color: var(--muted);
@@ -598,13 +601,50 @@ h2 {
   font-size: 0.92rem;
 }
 
-.timeline {
+.rule-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
 }
 
-.timeline article {
+.rule-card {
+  min-height: 300px;
+  padding: 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(18, 25, 32, 0.82);
+}
+
+.rule-card span,
+.combat-steps span {
+  display: inline-grid;
+  min-width: 2.25rem;
+  height: 2rem;
+  margin-bottom: 1rem;
+  place-items: center;
+  border: 1px solid rgba(215, 174, 85, 0.6);
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.rule-card ul {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.75rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+}
+
+.timeline,
+.combat-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.timeline article,
+.combat-steps article {
   min-height: 230px;
   padding: 1.1rem;
   border: 1px solid var(--line);
@@ -739,7 +779,9 @@ h2 {
   }
 
   .game-grid,
+  .rule-grid,
   .timeline,
+  .combat-steps,
   .battlefield-zone,
   .practice-topline,
   .battlefield-row {
