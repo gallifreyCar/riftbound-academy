@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>卡牌训练场 | 符文战场教学</title>
+    <meta
+      name="description"
+      content="像游戏新手教程一样学习英雄联盟卡牌游戏 Riftbound / 符文战场。"
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css?v=2" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="回到首页">
+        <span class="brand-mark">R</span>
+        <span>卡牌训练场</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#games">游戏库</a>
+        <a href="#lesson">教学</a>
+        <a href="#practice">实践</a>
+        <a href="#flow">回合</a>
+        <a href="#quiz">测验</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-art" aria-hidden="true">
+          <div class="lane lane-a"></div>
+          <div class="lane lane-b"></div>
+          <div class="battlefield field-left">
+            <span>战场 A</span>
+            <strong>控制</strong>
+          </div>
+          <div class="battlefield field-right">
+            <span>战场 B</span>
+            <strong>争夺</strong>
+          </div>
+          <div class="card-stack stack-left">
+            <i></i><i></i><i></i>
+          </div>
+          <div class="card-stack stack-right">
+            <i></i><i></i><i></i>
+          </div>
+        </div>
+        <div class="hero-copy">
+          <p class="eyebrow">英雄联盟 TCG 入门课</p>
+          <h1 id="hero-title">符文战场，从第一回合打明白</h1>
+          <p>
+            用「游戏教程」的节奏，把冠军、符文、战场、得分和战斗拆成一关一关的小任务。
+            先学会 Riftbound，之后这里还能继续加入更多卡牌游戏。
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#practice">打一把练习</a>
+            <a class="ghost-button" href="#games">查看游戏库</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="games" class="section game-library" aria-labelledby="games-title">
+        <div class="section-heading">
+          <p class="eyebrow">Game Library</p>
+          <h2 id="games-title">当前课程</h2>
+        </div>
+        <div class="game-grid">
+          <article class="game-card active">
+            <div class="game-icon">R</div>
+            <div>
+              <h3>符文战场 Riftbound</h3>
+              <p>2-4 人，选定冠军，在双方战场之间争夺控制，率先达到分数赢下对局。</p>
+            </div>
+            <span class="status">已开放</span>
+          </article>
+          <article class="game-card locked">
+            <div class="game-icon">+</div>
+            <div>
+              <h3>下一款游戏</h3>
+              <p>预留位置：以后可以继续加宝可梦、万智牌、影之诗等教学模块。</p>
+            </div>
+            <span class="status">待添加</span>
+          </article>
+        </div>
+      </section>
+
+      <section id="lesson" class="section trainer" aria-labelledby="lesson-title">
+        <div class="section-heading">
+          <p class="eyebrow">Tutorial Quest</p>
+          <h2 id="lesson-title">新手四关</h2>
+        </div>
+        <div class="lesson-shell">
+          <aside class="mission-list" aria-label="教学章节">
+            <button class="mission active" data-mission="0">
+              <span>01</span>
+              <strong>选你的冠军</strong>
+            </button>
+            <button class="mission" data-mission="1">
+              <span>02</span>
+              <strong>用符文付款</strong>
+            </button>
+            <button class="mission" data-mission="2">
+              <span>03</span>
+              <strong>派单位上战场</strong>
+            </button>
+            <button class="mission" data-mission="3">
+              <span>04</span>
+              <strong>抢到 8 分</strong>
+            </button>
+          </aside>
+          <article class="mission-panel">
+            <p class="mission-tag" id="mission-tag">任务 01</p>
+            <h3 id="mission-title">选你的冠军</h3>
+            <p id="mission-copy">
+              你的传奇冠军决定整套牌的颜色和打法。先别急着背全部规则，先回答一个问题：
+              你想快攻、铺场，还是靠一个关键角色到处支援？
+            </p>
+            <div class="mission-board" id="mission-board" aria-label="当前教学示意">
+              <div class="demo-card champion">Champion</div>
+              <div class="demo-card unit">Unit</div>
+              <div class="demo-card spell">Spell</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="practice" class="section practice" aria-labelledby="practice-title">
+        <div class="section-heading">
+          <p class="eyebrow">Practice Match</p>
+          <h2 id="practice-title">打一把脚本练习</h2>
+          <p>
+            这一局只保留新手必须先会的动作：拿符文、自动支付、打出单位、进攻对手战场、结算 Conquer 得分。
+            目标不是模拟全部规则，而是让第一回合真的动起来。
+          </p>
+        </div>
+        <div class="practice-shell">
+          <div class="practice-topline" aria-live="polite">
+            <div>
+              <span>阶段</span>
+              <strong id="practice-phase">准备</strong>
+            </div>
+            <div>
+              <span>你的分数</span>
+              <strong id="practice-score">0 / 8</strong>
+            </div>
+            <div>
+              <span>可用符文</span>
+              <strong id="practice-runes">0</strong>
+            </div>
+          </div>
+
+          <div class="practice-table">
+            <section class="coach-panel" aria-labelledby="coach-title">
+              <p class="eyebrow">Coach</p>
+              <h3 id="coach-title">训练目标</h3>
+              <p id="coach-copy">点击“开始对局”，系统会发给你一个固定起手，让你按顺序打完第一轮。</p>
+              <div class="practice-actions">
+                <button id="practice-primary">开始对局</button>
+                <button id="practice-undo" disabled>回退</button>
+                <button id="practice-reset">重开</button>
+              </div>
+            </section>
+
+            <section class="practice-board" aria-label="练习战场">
+              <div class="duel-zone opponent-row">
+                <span>对手后场</span>
+                <div class="mini-card enemy-card" id="enemy-card">敌方单位 2 力</div>
+              </div>
+              <div class="duel-zone battlefield-row">
+                <div class="practice-site" data-site="your">
+                  <span>你的战场</span>
+                  <div class="site-slot" id="site-your">空</div>
+                </div>
+                <div class="practice-site" data-site="enemy">
+                  <span>对手战场</span>
+                  <div class="site-slot" id="site-enemy">空</div>
+                </div>
+              </div>
+              <div class="duel-zone player-row">
+                <span>你的后场</span>
+                <div class="bench" id="player-bench">等待发牌</div>
+              </div>
+            </section>
+
+            <aside class="hand-panel" aria-labelledby="hand-title">
+              <p class="eyebrow">Hand</p>
+              <h3 id="hand-title">你的手牌</h3>
+              <div class="practice-hand" id="practice-hand"></div>
+              <ol class="practice-log" id="practice-log" aria-label="行动日志"></ol>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="flow" class="section flow" aria-labelledby="flow-title">
+        <div class="section-heading">
+          <p class="eyebrow">Turn Flow</p>
+          <h2 id="flow-title">一回合看这里</h2>
+        </div>
+        <div class="timeline">
+          <article>
+            <span>1</span>
+            <h3>拿两张符文</h3>
+            <p>每回合获得新的符文资源。普通费用可以横置支付，更强的费用可能要把符文放回符文牌堆。</p>
+          </article>
+          <article>
+            <span>2</span>
+            <h3>部署牌</h3>
+            <p>打出单位、法术或装备，决定这一回合是抢点、守点，还是为下一轮蓄力。</p>
+          </article>
+          <article>
+            <span>3</span>
+            <h3>移动到战场</h3>
+            <p>把冠军和单位派往自己或对手的战场。进入对手控制或无人控制的战场，会触发争夺。</p>
+          </article>
+          <article>
+            <span>4</span>
+            <h3>结算得分</h3>
+            <p>控制战场会得分。1v1 率先达到 8 分获胜，团队战目标是 11 分。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section board-section" aria-labelledby="board-title">
+        <div class="section-heading">
+          <p class="eyebrow">Battlefield Map</p>
+          <h2 id="board-title">战场为什么重要</h2>
+        </div>
+        <div class="playmat" aria-label="符文战场示意图">
+          <div class="zone player-zone">你的后场</div>
+          <div class="zone battlefield-zone">
+            <div>
+              <strong>你的战场</strong>
+              <span>守住后可 Hold 得分</span>
+            </div>
+            <div>
+              <strong>对手战场</strong>
+              <span>攻下后可 Conquer 得分</span>
+            </div>
+          </div>
+          <div class="zone opponent-zone">对手后场</div>
+        </div>
+      </section>
+
+      <section id="quiz" class="section quiz" aria-labelledby="quiz-title">
+        <div class="section-heading">
+          <p class="eyebrow">Ready Check</p>
+          <h2 id="quiz-title">三题确认你会打了</h2>
+        </div>
+        <div class="quiz-box">
+          <p id="question">1v1 对局中，通常要先达到几分获胜？</p>
+          <div class="answers">
+            <button data-correct="false">6 分</button>
+            <button data-correct="true">8 分</button>
+            <button data-correct="false">11 分</button>
+          </div>
+          <p class="feedback" id="feedback" role="status"></p>
+        </div>
+      </section>
+
+      <section class="section source-note" aria-labelledby="source-title">
+        <h2 id="source-title">规则来源</h2>
+        <p>
+          本页是玩家友好的中文教学改写，具体规则以 Riot 官方文档为准：
+          <a href="https://riftbound.leagueoflegends.com/en-us/news/rules-and-releases/how-to-play-get-started/" target="_blank" rel="noreferrer">Quick Start Guide</a>
+          和
+          <a href="https://riftbound.leagueoflegends.com/en-us/rules-hub/" target="_blank" rel="noreferrer">Rules Hub</a>。
+          本次练习对局按 Core Rules 中 1v1 的 Battlefield Count: 2、Victory Score: 8、Conquer / Hold 得分方式校正。
+        </p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>卡牌训练场 · 为 GitHub Pages 准备的静态教学站</p>
+    </footer>
+
+    <script src="./app.js?v=2"></script>
+  </body>
+</html>
