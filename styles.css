@@ -494,7 +494,7 @@ h2 {
 
 .practice-board {
   display: grid;
-  grid-template-rows: 1fr 1.3fr 1fr;
+  grid-template-rows: auto auto auto;
   min-width: 0;
 }
 
@@ -508,6 +508,71 @@ h2 {
 
 .player-row {
   border-bottom: 0;
+}
+
+.player-mat {
+  gap: 0.85rem;
+}
+
+.mat-title {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.mat-title span {
+  color: var(--cyan);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mat-title strong {
+  font-size: 1rem;
+}
+
+.zone-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.zone-card,
+.rune-bank,
+.zone-summary {
+  min-height: 4.1rem;
+  padding: 0.65rem;
+  border: 1px solid rgba(245, 241, 232, 0.14);
+  background: rgba(245, 241, 232, 0.045);
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.zone-card span,
+.zone-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.zone-card strong {
+  display: block;
+  color: var(--text);
+  font-size: 0.96rem;
+}
+
+.base-lane {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.base-lane > span,
+.player-row > span {
+  width: 100%;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .battlefield-row {
@@ -616,6 +681,17 @@ h2 {
   margin: 1rem 0 0;
   padding-left: 1.2rem;
   overflow: auto;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.zone-summary {
+  min-height: 0;
+  margin-top: 0.85rem;
+}
+
+.zone-summary p {
+  margin: 0;
   color: var(--muted);
   font-size: 0.92rem;
 }
@@ -803,7 +879,8 @@ h2 {
   .combat-steps,
   .battlefield-zone,
   .practice-topline,
-  .battlefield-row {
+  .battlefield-row,
+  .zone-grid {
     grid-template-columns: 1fr;
   }
 

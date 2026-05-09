@@ -9,7 +9,7 @@
       content="像游戏新手教程一样学习英雄联盟卡牌游戏 Riftbound / 符文战场。"
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=4" />
+    <link rel="stylesheet" href="./styles.css?v=5" />
   </head>
   <body>
     <header class="topbar">
@@ -146,7 +146,7 @@
               <strong id="practice-score">0 / 8</strong>
             </div>
             <div>
-              <span>可用符文</span>
+              <span>可用资源</span>
               <strong id="practice-runes">0</strong>
             </div>
           </div>
@@ -164,9 +164,33 @@
             </section>
 
             <section class="practice-board" aria-label="练习战场区域">
-              <div class="duel-zone opponent-row">
-                <span>对手基地</span>
-                <div class="mini-card enemy-card" id="enemy-card">敌方单位 2 力</div>
+              <div class="duel-zone player-mat opponent-row">
+                <div class="mat-title">
+                  <span>对手镜像区域</span>
+                  <strong>传奇区 / 英雄区 / 牌堆 / 基地</strong>
+                </div>
+                <div class="zone-grid">
+                  <div class="zone-card">
+                    <span>传奇区</span>
+                    <strong>亚索传奇</strong>
+                    <small>头：提供符文特性和被动/主动效果</small>
+                  </div>
+                  <div class="zone-card">
+                    <span>英雄区</span>
+                    <strong>亚索 - 选定英雄</strong>
+                    <small>身子：同名英雄单位牌，可按规则打出</small>
+                  </div>
+                  <div class="zone-card" id="opponent-main-deck">主牌堆 40</div>
+                  <div class="zone-card" id="opponent-rune-deck">符文牌堆 12</div>
+                  <div class="zone-card" id="opponent-discard">废牌堆 0</div>
+                  <div class="zone-card" id="opponent-banish">放逐区 0</div>
+                  <div class="zone-card" id="opponent-hand-count">手牌 0</div>
+                </div>
+                <div class="base-lane">
+                  <span>对手基地</span>
+                  <div class="mini-card enemy-card" id="enemy-card">敌方单位 2 力</div>
+                  <div class="rune-bank" id="opponent-rune-bank">已召出符文 0</div>
+                </div>
               </div>
               <div class="duel-zone battlefield-row" aria-label="战场区域">
                 <div class="practice-site" data-site="arena">
@@ -188,16 +212,41 @@
                   <div class="site-slot" id="site-bridge">无单位</div>
                 </div>
               </div>
-              <div class="duel-zone player-row">
+              <div class="duel-zone player-mat player-row">
+                <div class="mat-title">
+                  <span>你的区域</span>
+                  <strong>传奇区 / 英雄区 / 牌堆 / 基地</strong>
+                </div>
+                <div class="zone-grid">
+                  <div class="zone-card">
+                    <span>传奇区</span>
+                    <strong>金克丝传奇</strong>
+                    <small>头：提供符文特性和被动/主动效果</small>
+                  </div>
+                  <div class="zone-card">
+                    <span>英雄区</span>
+                    <strong>金克丝 - 反抗者</strong>
+                    <small>身子：同名英雄单位牌，可按规则打出</small>
+                  </div>
+                  <div class="zone-card" id="player-main-deck">主牌堆 40</div>
+                  <div class="zone-card" id="player-rune-deck">符文牌堆 12</div>
+                  <div class="zone-card" id="player-discard">废牌堆 0</div>
+                  <div class="zone-card" id="player-banish">放逐区 0</div>
+                  <div class="zone-card" id="player-hand-count">手牌 0</div>
+                </div>
                 <span>你的基地</span>
                 <div class="bench" id="player-bench">等待发牌</div>
+                <div class="rune-bank" id="player-rune-bank">已召出符文 0</div>
               </div>
             </section>
 
             <aside class="hand-panel" aria-labelledby="hand-title">
               <p class="eyebrow">Hand</p>
-              <h3 id="hand-title">你的手牌</h3>
+              <h3 id="hand-title">你的手牌与区域</h3>
               <div class="practice-hand" id="practice-hand"></div>
+              <div class="zone-summary" aria-label="区域提醒">
+                <p>主牌堆、符文牌堆、废牌堆、放逐区都各自独立。符文是 12 张符文牌堆，不是主牌堆的一部分。</p>
+              </div>
               <ol class="practice-log" id="practice-log" aria-label="行动日志"></ol>
             </aside>
           </div>
@@ -363,6 +412,6 @@
       <p>卡牌训练场 · 为 GitHub Pages 准备的静态教学站</p>
     </footer>
 
-    <script src="./app.js?v=4"></script>
+    <script src="./app.js?v=5"></script>
   </body>
 </html>
