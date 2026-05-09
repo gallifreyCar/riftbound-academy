@@ -96,7 +96,7 @@ const initialPractice = {
   },
   hand: [],
   log: [],
-  coach: "点击“开始准备”，先投骰决定起始玩家，再随机抽出双方各 1 张战场。",
+  coach: "点击“开始准备”，先投骰决定先后手，再由双方互抽对方提供的战场。",
   primary: "开始准备",
 };
 
@@ -239,13 +239,13 @@ function renderPractice() {
   enemyCard.classList.toggle("hidden", !practice.enemyVisible);
   zoneCounters.playerMainDeck.textContent = `主牌堆 ${practice.playerMainDeck}`;
   zoneCounters.playerRuneDeck.textContent = `符文牌堆 ${practice.playerRuneDeck}`;
-  zoneCounters.playerDiscard.textContent = `废牌堆 ${practice.playerDiscard}`;
+  zoneCounters.playerDiscard.textContent = `弃牌堆 ${practice.playerDiscard}`;
   zoneCounters.playerBanish.textContent = `放逐区 ${practice.playerBanish}`;
   zoneCounters.playerHandCount.textContent = `手牌 ${practice.hand.length + practice.playerHandCountOverride}`;
   zoneCounters.playerRuneBank.innerHTML = renderRuneBank(practice.playerRunes, "你的符文");
   zoneCounters.opponentMainDeck.textContent = `主牌堆 ${practice.opponentMainDeck}`;
   zoneCounters.opponentRuneDeck.textContent = `符文牌堆 ${practice.opponentRuneDeck}`;
-  zoneCounters.opponentDiscard.textContent = `废牌堆 ${practice.opponentDiscard}`;
+  zoneCounters.opponentDiscard.textContent = `弃牌堆 ${practice.opponentDiscard}`;
   zoneCounters.opponentBanish.textContent = `放逐区 ${practice.opponentBanish}`;
   zoneCounters.opponentHandCount.textContent = `手牌 ${practice.opponentHand}`;
   zoneCounters.opponentRuneBank.innerHTML = renderRuneBank(practice.opponentRunes, "对手符文");
@@ -277,14 +277,14 @@ function advancePractice() {
     practice.step = 1;
     practice.phase = "投骰";
     practice.primary = "抽取战场";
-    practice.coach = "用公平随机方式决定回合顺序。脚本里你投出高点并成为起始玩家；第二个行动的玩家会在自己首个召出阶段额外召出 1 张符文。";
+    practice.coach = "投骰只决定先手后手和回合顺序。脚本里你投出高点并成为起始玩家；第二个行动的玩家会在自己首个召出阶段额外召出 1 张符文。";
     addPracticeLog("投骰：你获得先手。对手作为第二行动玩家，首个召出阶段会额外召出 1 张符文。");
   } else if (practice.step === 1) {
     practice.step = 2;
     practice.phase = "抽战场";
     practice.primary = "布置起手";
-    practice.coach = "1v1 决斗每名玩家从自己提供的 3 个战场里随机选 1 个。两张战场同时放入同一个战场区域，而不是上中下三路。";
-    addPracticeLog("抽战场：你抽到荣耀竞技场，对手抽到河道渡口，剩余战场移出本局。");
+    practice.coach = "战场不是投骰决定，也不是自己抽自己的。1v1 中你从对手提供的 3 张战场里随机抽 1 张；对手从你提供的 3 张里随机抽 1 张。两张战场同时放入同一个战场区域。";
+    addPracticeLog("互抽战场：你从对手的 3 张里抽到荣耀竞技场；对手从你的 3 张里抽到河道渡口。");
   } else if (practice.step === 2) {
     practice.step = 3;
     practice.phase = "开局";
@@ -355,7 +355,7 @@ function advancePractice() {
       status: "被占领 · 控制者：你",
     };
     practice.coach = "非战斗法术对决结束后，如果只剩你的单位在该战场，你确立控制。因为本回合还没有通过这个战场得分，所以这次控制变化视为征服。";
-    addPracticeLog("控制：你建立对战场 B 的控制。提供者仍是对手，但控制者现在是你。");
+    addPracticeLog("控制：你建立对战场 B 的控制。战场提供者不因控制权变化而改变。");
   } else if (practice.step === 10) {
     practice.step = 11;
     practice.phase = "得分";

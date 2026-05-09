@@ -9,7 +9,7 @@
       content="像游戏新手教程一样学习英雄联盟卡牌游戏 Riftbound / 符文战场。"
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=6" />
+    <link rel="stylesheet" href="./styles.css?v=7" />
   </head>
   <body>
     <header class="topbar">
@@ -131,7 +131,7 @@
           <p class="eyebrow">Practice Match</p>
           <h2 id="practice-title">打一把脚本练习</h2>
           <p>
-            这一局从投骰、抽战场、起手调度开始，接着练符文横置支付、单位休眠进场、下回合激活后标准移动、迅捷/反应时机、征服、据守和一次战斗。
+            这一局从投骰决定先后手、互抽对方战场、起手调度开始，接着练符文横置支付、单位休眠进场、下回合激活后标准移动、迅捷/反应时机、征服、据守和一次战斗。
             目标是让第一把牌的骨架按规则真的动起来。
           </p>
         </div>
@@ -155,7 +155,7 @@
             <section class="coach-panel" aria-labelledby="coach-title">
               <p class="eyebrow">Coach</p>
               <h3 id="coach-title">训练目标</h3>
-              <p id="coach-copy">点击“开始准备”，从投骰决定先后手开始，按规则走完整个教学脚本。</p>
+              <p id="coach-copy">点击“开始准备”，从投骰决定先后手、互抽对方战场开始，按规则走完整个教学脚本。</p>
               <div class="practice-actions">
                 <button id="practice-primary">开始准备</button>
                 <button id="practice-undo" disabled>回退</button>
@@ -163,41 +163,38 @@
               </div>
             </section>
 
-            <section class="practice-board" aria-label="练习战场区域">
-              <div class="duel-zone player-mat opponent-row opponent-mat">
-                <div class="mat-title">
-                  <span>对手镜像区域</span>
-                  <strong>传奇区 / 英雄区 / 牌堆 / 基地</strong>
-                </div>
-                <div class="zone-grid">
-                  <div class="zone-card">
-                    <span>传奇区</span>
+            <section class="practice-board tabletop-board" aria-label="线下牌桌练习区域">
+              <div class="table-player opponent-mat" aria-label="对手牌桌">
+                <div class="table-row table-row-zones">
+                  <div class="table-zone deck-zone" id="opponent-main-deck">主牌堆 40</div>
+                  <div class="table-zone pile-zone discard-zone" id="opponent-discard">弃牌堆 0</div>
+                  <div class="table-zone pile-zone banish-zone" id="opponent-banish">放逐区 0</div>
+                  <div class="table-zone rune-deck-zone" id="opponent-rune-deck">符文牌堆 12</div>
+                  <div class="table-zone rune-play-zone" id="opponent-rune-bank">符文区 0</div>
+                  <div class="table-zone base-zone">
+                    <span>基地</span>
+                    <div class="table-card enemy-card hidden" id="enemy-card">敌方单位 2 力</div>
+                  </div>
+                  <div class="table-zone legend-zone">
+                    <span>传奇</span>
                     <strong>亚索传奇</strong>
-                    <small>头：提供符文特性和被动/主动效果</small>
+                    <small>头：符文特性与被动/主动</small>
                   </div>
-                  <div class="zone-card">
-                    <span>英雄区</span>
+                  <div class="table-zone hero-zone">
+                    <span>英雄</span>
                     <strong>亚索 - 选定英雄</strong>
-                    <small>身子：同名英雄单位牌，可按规则打出</small>
+                    <small>身子：同名英雄单位牌</small>
                   </div>
-                  <div class="zone-card counter-zone" id="opponent-main-deck">主牌堆 40</div>
-                  <div class="zone-card counter-zone" id="opponent-rune-deck">符文牌堆 12</div>
-                  <div class="zone-card counter-zone" id="opponent-discard">废牌堆 0</div>
-                  <div class="zone-card counter-zone" id="opponent-banish">放逐区 0</div>
-                  <div class="zone-card counter-zone" id="opponent-hand-count">手牌 0</div>
                 </div>
-                <div class="base-lane">
-                  <span>对手基地</span>
-                  <div class="mini-card enemy-card" id="enemy-card">敌方单位 2 力</div>
-                  <div class="rune-bank" id="opponent-rune-bank">已召出符文 0</div>
-                </div>
+                <div class="hand-strip opponent-hand-strip" id="opponent-hand-count">对手手牌 0</div>
               </div>
-              <div class="duel-zone battlefield-row" aria-label="战场区域">
+
+              <div class="battlefield-row table-battlefields" aria-label="战场区域">
                 <div class="practice-site" data-site="arena">
                   <div class="site-header">
                     <span>战场 A</span>
                     <strong>荣耀竞技场</strong>
-                    <small>提供者：你</small>
+                    <small>由对手提供，你抽到</small>
                   </div>
                   <div class="site-state" id="state-arena">开放 · 未受控制</div>
                   <div class="site-slot" id="site-arena">无单位</div>
@@ -206,37 +203,36 @@
                   <div class="site-header">
                     <span>战场 B</span>
                     <strong>河道渡口</strong>
-                    <small>提供者：对手</small>
+                    <small>由你提供，对手抽到</small>
                   </div>
                   <div class="site-state" id="state-bridge">开放 · 未受控制</div>
                   <div class="site-slot" id="site-bridge">无单位</div>
                 </div>
               </div>
-              <div class="duel-zone player-mat player-row">
-                <div class="mat-title">
-                  <span>你的区域</span>
-                  <strong>传奇区 / 英雄区 / 牌堆 / 基地</strong>
-                </div>
-                <div class="zone-grid">
-                  <div class="zone-card">
-                    <span>传奇区</span>
+
+              <div class="table-player player-mat" aria-label="你的牌桌">
+                <div class="table-row table-row-zones">
+                  <div class="table-zone deck-zone" id="player-main-deck">主牌堆 40</div>
+                  <div class="table-zone pile-zone discard-zone" id="player-discard">弃牌堆 0</div>
+                  <div class="table-zone pile-zone banish-zone" id="player-banish">放逐区 0</div>
+                  <div class="table-zone rune-deck-zone" id="player-rune-deck">符文牌堆 12</div>
+                  <div class="table-zone rune-play-zone" id="player-rune-bank">符文区 0</div>
+                  <div class="table-zone base-zone">
+                    <span>基地</span>
+                    <div class="bench" id="player-bench">等待发牌</div>
+                  </div>
+                  <div class="table-zone legend-zone">
+                    <span>传奇</span>
                     <strong>金克丝传奇</strong>
-                    <small>头：提供符文特性和被动/主动效果</small>
+                    <small>头：符文特性与被动/主动</small>
                   </div>
-                  <div class="zone-card">
-                    <span>英雄区</span>
+                  <div class="table-zone hero-zone">
+                    <span>英雄</span>
                     <strong>金克丝 - 反抗者</strong>
-                    <small>身子：同名英雄单位牌，可按规则打出</small>
+                    <small>身子：同名英雄单位牌</small>
                   </div>
-                  <div class="zone-card counter-zone" id="player-main-deck">主牌堆 40</div>
-                  <div class="zone-card counter-zone" id="player-rune-deck">符文牌堆 12</div>
-                  <div class="zone-card counter-zone" id="player-discard">废牌堆 0</div>
-                  <div class="zone-card counter-zone" id="player-banish">放逐区 0</div>
-                  <div class="zone-card counter-zone" id="player-hand-count">手牌 0</div>
                 </div>
-                <span>你的基地</span>
-                <div class="bench" id="player-bench">等待发牌</div>
-                <div class="rune-bank" id="player-rune-bank">已召出符文 0</div>
+                <div class="hand-strip player-hand-strip" id="player-hand-count">你的手牌 0</div>
               </div>
             </section>
 
@@ -245,7 +241,7 @@
               <h3 id="hand-title">你的手牌与区域</h3>
               <div class="practice-hand" id="practice-hand"></div>
               <div class="zone-summary" aria-label="区域提醒">
-                <p>主牌堆、符文牌堆、废牌堆、放逐区都各自独立。符文是 12 张符文牌；横置后仍在基地，直到效果让它回收。</p>
+                <p>主牌堆、符文牌堆、弃牌堆、放逐区都各自独立。符文是 12 张符文牌；横置后仍在基地，直到效果让它回收。</p>
               </div>
               <ol class="practice-log" id="practice-log" aria-label="行动日志"></ol>
             </aside>
@@ -266,7 +262,8 @@
             <h3>开局准备</h3>
             <ul>
               <li>传奇放入传奇区，选定英雄放入英雄区，主牌堆与 12 张符文牌堆分别洗切放置。</li>
-              <li>1v1 每名玩家提供 3 个战场，准备时随机选 1 个；两张选定战场同时放入战场区域。</li>
+              <li>1v1 每名玩家提供 3 个战场；准备时你随机抽对手 1 张战场，对手随机抽你 1 张战场。</li>
+              <li>投骰或其他公平随机方式只决定起始玩家和回合顺序，不决定战场。</li>
               <li>用公平随机方式决定起始玩家。双方各抽 4 张，按回合顺序调度最多 2 张。</li>
               <li>第二个行动的玩家，其首个召出阶段额外召出 1 张符文。</li>
             </ul>
@@ -426,11 +423,11 @@
           <div class="zone battlefield-zone">
             <div>
               <strong>战场 A</strong>
-              <span>提供者：你 · 控制者会变化</span>
+              <span>对手提供 · 你抽到 · 控制者会变化</span>
             </div>
             <div>
               <strong>战场 B</strong>
-              <span>提供者：对手 · 控制者会变化</span>
+              <span>你提供 · 对手抽到 · 控制者会变化</span>
             </div>
           </div>
           <div class="zone opponent-zone">对手基地</div>
@@ -460,7 +457,7 @@
           <a href="https://riftbound.leagueoflegends.com/en-us/news/rules-and-releases/how-to-play-get-started/" target="_blank" rel="noreferrer">Quick Start Guide</a>
           和
           <a href="https://riftbound.leagueoflegends.com/en-us/rules-hub/" target="_blank" rel="noreferrer">Rules Hub</a>。
-          本次练习对局按你提供的《符文战场》核心规则 2026-03-30 中文版校正：1v1 战场数量为 2，获胜得分为 8，并使用投骰/随机先后手、随机战场、休眠/激活、迅捷/反应、征服 / 据守和 Combat 步骤。
+          本次练习对局按你提供的《符文战场》核心规则 2026-03-30 中文版校正：1v1 战场数量为 2，获胜得分为 8，并使用投骰决定先后手、双方互抽对方战场、休眠/激活、迅捷/反应、征服 / 据守和 Combat 步骤。
         </p>
       </section>
     </main>
@@ -469,6 +466,6 @@
       <p>卡牌训练场 · 为 GitHub Pages 准备的静态教学站</p>
     </footer>
 
-    <script src="./app.js?v=6"></script>
+    <script src="./app.js?v=7"></script>
   </body>
 </html>
