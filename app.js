@@ -96,7 +96,8 @@ const initialPractice = {
   playerRunes: [],
   playerDiscard: 0,
   playerBanish: 0,
-  playerHandCountOverride: 0,
+  mulliganSelection: [],
+  mulliganConfirmed: false,
   opponentMainDeck: 40,
   opponentRuneDeck: 12,
   opponentRunes: [],
@@ -119,14 +120,49 @@ const practiceCards = [
     id: "scout",
     name: "皮城侦察兵",
     cost: 1,
+    kind: "unit",
     text: "2 力单位。打出后先休眠进基地。",
   },
   {
     id: "trick",
     name: "精准指令",
     cost: 1,
+    kind: "spell",
     speed: "swift",
     text: "迅捷练习牌。法术对决开环时打出。",
+  },
+  {
+    id: "dragon",
+    name: "熔浆巨龙",
+    cost: 8,
+    kind: "unit",
+    mulliganTarget: true,
+    text: "高费单位。起手太重，调度换掉。",
+  },
+  {
+    id: "breaker",
+    name: "裂浪者前锋",
+    cost: 10,
+    kind: "unit",
+    mulliganTarget: true,
+    text: "高费单位。先搁置，抽同数量补回。",
+  },
+];
+
+const replacementPracticeCards = [
+  {
+    id: "spark",
+    name: "爆破火花",
+    cost: 1,
+    kind: "spell",
+    text: "调度补回。留作低费选择。",
+  },
+  {
+    id: "guard",
+    name: "码头守卫",
+    cost: 2,
+    kind: "unit",
+    text: "调度补回。低费单位更适合开局。",
   },
 ];
 
@@ -257,6 +293,34 @@ function addPracticeLog(text) {
   practice.log.unshift(text);
 }
 
+function renderPracticeCard(card) {
+  return `
+    <button class="hand-card ${card.kind || ""} ${card.speed || ""} ${practice.mulliganSelection.includes(card.id) ? "selected" : ""}" data-card="${card.id}" ${canPlayPracticeCard(card.id) ? "" : "disabled"}>
+      ${card.name}
+      <span>${practice.mulliganSelection.includes(card.id) ? "待替换 · " : ""}费用 ${card.cost} · ${card.text}</span>
+    </button>
+  `;
+}
+
+function renderMulliganHand() {
+  const selectedCards = getSelectedMulliganCards();
+  const cardsInHand = practice.hand.filter((card) => !practice.mulliganSelection.includes(card.id));
+  const emptySlots = Array.from({ length: 2 - selectedCards.length }, (_, index) => `<div class="mulligan-empty">空槽 ${index + 1}</div>`).join("");
+
+  return `
+    <div class="mulligan-stage">
+      <div class="mulligan-tray" aria-label="调度区">
+        <span>调度区 ${selectedCards.length} / 2</span>
+        <div class="mulligan-row">${selectedCards.map(renderPracticeCard).join("")}${emptySlots}</div>
+      </div>
+      <div class="mulligan-hand" aria-label="起手手牌">
+        <span>起手手牌</span>
+        <div class="mulligan-row">${cardsInHand.map(renderPracticeCard).join("")}</div>
+      </div>
+    </div>
+  `;
+}
+
 function renderPractice() {
   practicePhase.textContent = practice.phase;
   practiceScore.textContent = `${practice.score} / 8`;
@@ -276,7 +340,7 @@ function renderPractice() {
   zoneCounters.playerRuneDeck.textContent = `符文牌堆 ${practice.playerRuneDeck}`;
   zoneCounters.playerDiscard.textContent = `废牌堆 ${practice.playerDiscard}`;
   zoneCounters.playerBanish.textContent = `放逐区 ${practice.playerBanish}`;
-  zoneCounters.playerHandCount.textContent = `手牌 ${practice.hand.length + practice.playerHandCountOverride}`;
+  zoneCounters.playerHandCount.textContent = `手牌 ${practice.hand.length}`;
   zoneCounters.playerRuneBank.innerHTML = renderRuneBank(practice.playerRunes, "你的符文");
   zoneCounters.opponentMainDeck.textContent = `主牌堆 ${practice.opponentMainDeck}`;
   zoneCounters.opponentRuneDeck.textContent = `符文牌堆 ${practice.opponentRuneDeck}`;
@@ -291,21 +355,18 @@ function renderPractice() {
     element.status.textContent = practice.sites[site].status;
   });
 
-  practiceHand.innerHTML = practice.hand
-    .map(
-      (card) => `
-        <button class="hand-card ${card.speed || ""}" data-card="${card.id}" ${canPlayPracticeCard(card.id) ? "" : "disabled"}>
-          ${card.name}
-          <span>费用 ${card.cost} · ${card.text}</span>
-        </button>
-      `,
-    )
-    .join("");
+  practiceHand.innerHTML =
+    practice.step === 3 && !practice.mulliganConfirmed
+      ? renderMulliganHand()
+      : practice.hand.map(renderPracticeCard).join("");
 
   practiceLog.innerHTML = practice.log.map((item) => `<li>${item}</li>`).join("");
 }
 
 function canPlayPracticeCard(cardId) {
+  if (practice.step === 3 && !practice.mulliganConfirmed) {
+    return practice.hand.some((card) => card.id === cardId);
+  }
   if (cardId === "scout") {
     return practice.step === 4 && practice.benchState !== "rested";
   }
@@ -313,6 +374,64 @@ function canPlayPracticeCard(cardId) {
     return practice.step === 14;
   }
   return false;
+}
+
+function getSelectedMulliganCards() {
+  return practice.hand.filter((card) => practice.mulliganSelection.includes(card.id));
+}
+
+function toggleMulliganCard(cardId) {
+  const card = practice.hand.find((item) => item.id === cardId);
+  if (!card || practice.step !== 3) {
+    return;
+  }
+
+  savePractice();
+
+  if (practice.mulliganSelection.includes(cardId)) {
+    practice.mulliganSelection = practice.mulliganSelection.filter((id) => id !== cardId);
+  } else if (practice.mulliganSelection.length < 2) {
+    practice.mulliganSelection = [...practice.mulliganSelection, cardId];
+  } else {
+    practice.coach = "调度最多选择 2 张牌。先取消一张，再选择另一张。";
+  }
+
+  const selectedNames = getSelectedMulliganCards()
+    .map((item) => item.name)
+    .join("、");
+  if (selectedNames) {
+    practice.coach = `已搁置：${selectedNames}。小程序教学里会把选中的不满意手牌移到调度槽；这里选满两张后点“确认替换”。`;
+  }
+
+  renderPractice();
+}
+
+function confirmMulligan() {
+  const selectedCards = getSelectedMulliganCards();
+  const targetIds = practiceCards.filter((card) => card.mulliganTarget).map((card) => card.id);
+  const selectedIds = selectedCards.map((card) => card.id);
+  const selectedTargetCards = targetIds.every((id) => selectedIds.includes(id));
+
+  if (selectedCards.length !== 2 || !selectedTargetCards) {
+    practice.coach = "请像小程序教学那样，选择两张明显不适合起手的高费牌：熔浆巨龙和裂浪者前锋，然后再确认替换。";
+    renderPractice();
+    return false;
+  }
+
+  savePractice();
+  practice.hand = [
+    ...practice.hand.filter((card) => !practice.mulliganSelection.includes(card.id)),
+    ...structuredClone(replacementPracticeCards),
+  ];
+  practice.mulliganSelection = [];
+  practice.mulliganConfirmed = true;
+  practice.phase = "调度完成";
+  practice.playerMainDeck = 36;
+  practice.primary = "进入召出阶段";
+  practice.coach = "调度完成：你搁置 2 张高费牌，抽 2 张补回，最后把搁置牌回收至主牌堆底。主牌堆仍是 36 张，手牌保持 4 张。";
+  addPracticeLog("调度：搁置熔浆巨龙、裂浪者前锋，抽 2 张补回，再回收被搁置的牌到主牌堆底。");
+  renderPractice();
+  return true;
 }
 
 function advancePractice() {
@@ -332,15 +451,16 @@ function advancePractice() {
     addPracticeLog("互抽战场：你从对手的 3 张里抽到荣耀竞技场；对手从你的 3 张里抽到河道渡口。");
   } else if (practice.step === 2) {
     practice.step = 3;
-    practice.phase = "开局";
-    practice.playerMainDeck = 38;
+    practice.phase = "调度";
+    practice.playerMainDeck = 36;
     practice.opponentMainDeck = 36;
     practice.opponentHand = 4;
-    practice.playerHandCountOverride = 2;
+    practice.mulliganSelection = [];
+    practice.mulliganConfirmed = false;
     practice.hand = structuredClone(practiceCards);
-    practice.primary = "进入召出阶段";
-    practice.coach = "传奇进传奇区，选定英雄进英雄区。双方主牌堆和符文牌堆洗切，各抽 4 张并按回合顺序调度最多 2 张；这里把另外两张手牌折叠成数量显示。";
-    addPracticeLog("开局：传奇、英雄、主牌堆、符文牌堆放入各自区域；双方抽 4 并调度最多 2。");
+    practice.primary = "确认替换";
+    practice.coach = "传奇进传奇区，选定英雄进英雄区。双方洗切并各抽 4 张。现在实际调度：点击两张不满意的高费手牌“熔浆巨龙”和“裂浪者前锋”，再确认替换。";
+    addPracticeLog("开局：传奇、英雄、主牌堆、12 张符文牌堆放入各自区域；双方各抽 4 张。");
   } else if (practice.step === 3) {
     practice.step = 4;
     practice.phase = "召出";
@@ -503,6 +623,11 @@ function playPracticeCard(cardId) {
     return;
   }
 
+  if (practice.step === 3 && !practice.mulliganConfirmed) {
+    toggleMulliganCard(cardId);
+    return;
+  }
+
   if (cardId === "trick") {
     savePractice();
     restPlayerRunes(1);
@@ -543,6 +668,10 @@ practicePrimary.addEventListener("click", () => {
   if (practice.step === 14) {
     practice.coach = "这里要实际练一次时机窗口：请点击手牌里的“精准指令”，它是迅捷法术。";
     renderPractice();
+    return;
+  }
+  if (practice.step === 3 && !practice.mulliganConfirmed) {
+    confirmMulligan();
     return;
   }
   advancePractice();
