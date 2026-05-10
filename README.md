@@ -19,4 +19,5 @@
 - https://riftbound.leagueoflegends.com/en-us/news/rules-and-releases/how-to-play-get-started/
 - https://riftbound.leagueoflegends.com/en-us/rules-hub/
 - 用户提供的《符文战场》核心规则 2026-03-30 中文版。
-- Core Rules: 1v1 使用 Battlefield Count: 2，Victory Score: 8；练习对局按传奇区/英雄区、主牌堆、12 张符文牌堆、废牌堆、放逐区、战场区域、战场提供者/控制者、投骰决定先后手、双方互抽对方战场、单位休眠进场、开始阶段激活、标准移动费用、迅捷/反应时机、Conquer / Hold 得分和 Combat 步骤校正。
+- Core Rules: 1v1 使用 Battlefield Count: 2，Victory Score: 8；练习对局按英雄区/传奇区、主牌堆、12 张符文牌堆、废牌堆、放逐区、战场区域、战场提供者/控制者、投骰决定先后手、双方互抽对方战场、单位休眠进场、开始阶段激活、召出与抽牌、标准移动费用、迅捷/反应时机、Conquer / Hold 得分、Combat 步骤、回收和致胜分限制校正。
+- 用户提供的小程序截图：对齐六章教学节奏、实体桌面摆放、符文横置/回收、单位横置/正放和双方镜像区域。

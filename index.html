@@ -9,7 +9,7 @@
       content="像游戏新手教程一样学习英雄联盟卡牌游戏 Riftbound / 符文战场。"
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=10" />
+    <link rel="stylesheet" href="./styles.css?v=12" />
   </head>
   <body>
     <header class="topbar">
@@ -89,33 +89,40 @@
       <section id="lesson" class="section trainer" aria-labelledby="lesson-title">
         <div class="section-heading">
           <p class="eyebrow">Tutorial Quest</p>
-          <h2 id="lesson-title">新手四关</h2>
+          <h2 id="lesson-title">小程序六关</h2>
         </div>
         <div class="lesson-shell">
           <aside class="mission-list" aria-label="教学章节">
             <button class="mission active" data-mission="0">
               <span>01</span>
-              <strong>选你的冠军</strong>
+              <strong>认识你的卡牌</strong>
             </button>
             <button class="mission" data-mission="1">
               <span>02</span>
-              <strong>用符文付款</strong>
+              <strong>回合开始</strong>
             </button>
             <button class="mission" data-mission="2">
               <span>03</span>
-              <strong>派单位上战场</strong>
+              <strong>占领=得分</strong>
             </button>
             <button class="mission" data-mission="3">
               <span>04</span>
-              <strong>抢到 8 分</strong>
+              <strong>战斗对决</strong>
+            </button>
+            <button class="mission" data-mission="4">
+              <span>05</span>
+              <strong>据守再得分</strong>
+            </button>
+            <button class="mission" data-mission="5">
+              <span>06</span>
+              <strong>夺取最终胜利</strong>
             </button>
           </aside>
           <article class="mission-panel">
             <p class="mission-tag" id="mission-tag">任务 01</p>
-            <h3 id="mission-title">选你的冠军</h3>
+            <h3 id="mission-title">认识你的卡牌</h3>
             <p id="mission-copy">
-              你的传奇冠军决定整套牌的颜色和打法。先别急着背全部规则，先回答一个问题：
-              你想快攻、铺场，还是靠一个关键角色到处支援？
+              先把桌面搭出来：选定英雄是可以按规则打出的“身子”，传奇是提供符文特性和技能的“头”，主牌堆、符文牌堆、废牌堆各自分开放。
             </p>
             <div class="mission-board" id="mission-board" aria-label="当前教学示意">
               <div class="demo-card champion">Champion</div>
@@ -165,14 +172,14 @@
 
             <section class="practice-board tabletop-board physical-playmat" aria-label="线下牌桌练习区域">
               <div class="score-track" aria-label="分数轨">
-                <span>8</span>
-                <span>7</span>
-                <span>6</span>
-                <span>5</span>
-                <span>4</span>
-                <span>3</span>
-                <span>2</span>
-                <span>1</span>
+                <span data-score="8">8</span>
+                <span data-score="7">7</span>
+                <span data-score="6">6</span>
+                <span data-score="5">5</span>
+                <span data-score="4">4</span>
+                <span data-score="3">3</span>
+                <span data-score="2">2</span>
+                <span data-score="1">1</span>
                 <strong>你</strong>
               </div>
 
@@ -236,7 +243,7 @@
               <h3 id="hand-title">你的手牌与区域</h3>
               <div class="practice-hand" id="practice-hand"></div>
               <div class="zone-summary" aria-label="区域提醒">
-                <p>主牌堆、符文牌堆、废牌堆、放逐区都各自独立。符文是 12 张符文牌；横置后仍在基地，直到效果让它回收。</p>
+                <p>主牌堆、符文牌堆、废牌堆、放逐区都各自独立。符文是 12 张符文牌；横置支付后仍在场，回收时回到符文牌堆底。</p>
               </div>
               <ol class="practice-log" id="practice-log" aria-label="行动日志"></ol>
             </aside>
@@ -267,11 +274,20 @@
             <span>Terms</span>
             <h3>关键名词</h3>
             <ul>
-              <li>传奇区：英雄的“头”，放传奇卡，提供符文特性与被动/主动效果。</li>
               <li>英雄区：英雄的“身子”，放同名选定英雄单位牌，可从这里按规则打出。</li>
+              <li>传奇区：英雄的“头”，放传奇卡，提供符文特性与被动/主动效果。</li>
               <li>基地：你的单位、装备和已召出的符文通常所在的位置。</li>
               <li>符文池：临时法力/符能记录；抽牌阶段结束和回合结束时清空。</li>
               <li>战场区域：只放 2 个战场；每个战场是单独位置，提供者不等于控制者。</li>
+            </ul>
+          </article>
+          <article class="rule-card">
+            <span>Mat</span>
+            <h3>桌面摆放</h3>
+            <ul>
+              <li>你的区域与对手镜像摆放；两张战场位于中间同一个战场区域。</li>
+              <li>选定英雄与传奇是公开区，主牌堆、符文牌堆和手牌数量各自独立。</li>
+              <li>废牌堆公开且无序；放逐区公开且无序，通常代表更难恢复的移除。</li>
             </ul>
           </article>
           <article class="rule-card">
@@ -282,6 +298,15 @@
               <li>标准移动的费用是让该单位休眠，所以已经休眠的单位不能支付这项费用。</li>
               <li>你的开始阶段会将你控制的非法术游戏物体激活，也就是正放。</li>
               <li>符文使用其获得资源技能时也会横置；横置符文不能再次横置支付。</li>
+            </ul>
+          </article>
+          <article class="rule-card">
+            <span>Recycle</span>
+            <h3>回收</h3>
+            <ul>
+              <li>回收不是弃置：从指定区域选牌，放到对应牌堆底。</li>
+              <li>主牌堆卡牌回主牌堆底；符文回符文牌堆底。</li>
+              <li>回收作为费用时，必须真的能完成；没有可回收对象就不能支付这项费用。</li>
             </ul>
           </article>
           <article class="rule-card">
@@ -310,6 +335,7 @@
               <li>征服：通过争夺获得一个本回合尚未得分的战场控制权。</li>
               <li>据守：在自己开始阶段仍控制战场。</li>
               <li>每名玩家每回合每个战场最多得 1 分。1v1 获胜得分为 8。</li>
+              <li>最后一分有额外限制：据守可以直接拿致胜分；征服要本回合每个战场都得过分，否则改为抽一张牌。</li>
             </ul>
           </article>
         </div>
@@ -324,12 +350,12 @@
           <article>
             <span>1</span>
             <h3>回合开始</h3>
-            <p>激活自己控制的非法术游戏物体，处理开始阶段触发，并在得分计算步骤据守已控制战场。</p>
+            <p>先唤醒：激活自己控制的非法术游戏物体。再处理开始阶段触发，并在得分计算步骤据守已控制战场。</p>
           </article>
           <article>
             <span>2</span>
             <h3>召出与抽牌</h3>
-            <p>从符文牌堆召出 2 张符文，再抽 1 张牌。第二行动玩家的首个召出阶段额外召出 1 张符文。</p>
+            <p>从符文牌堆召出 2 张符文，再抽 1 张牌，随后清空所有玩家的符文池。第二行动玩家的首个召出阶段额外召出 1 张符文。</p>
           </article>
           <article>
             <span>3</span>
@@ -398,7 +424,7 @@
           <article>
             <span>03</span>
             <h3>分配战斗伤害</h3>
-            <p>双方各自计算本方单位总战力，从进攻方开始给对方单位分配伤害，然后同时造成。</p>
+            <p>双方各自计算本方单位总战力，从进攻方开始给对方单位分配伤害。分配不等于造成；分配完成后才同时造成。</p>
           </article>
           <article>
             <span>04</span>
@@ -452,7 +478,7 @@
           <a href="https://riftbound.leagueoflegends.com/en-us/news/rules-and-releases/how-to-play-get-started/" target="_blank" rel="noreferrer">Quick Start Guide</a>
           和
           <a href="https://riftbound.leagueoflegends.com/en-us/rules-hub/" target="_blank" rel="noreferrer">Rules Hub</a>。
-          本次练习对局按你提供的《符文战场》核心规则 2026-03-30 中文版校正：1v1 战场数量为 2，获胜得分为 8，并使用投骰决定先后手、双方互抽对方战场、休眠/激活、迅捷/反应、征服 / 据守和 Combat 步骤。
+          本次练习对局按你提供的《符文战场》核心规则 2026-03-30 中文版校正：1v1 战场数量为 2，获胜得分为 8，并使用投骰决定先后手、双方互抽对方战场、休眠/激活、召出与抽牌、迅捷/反应、征服 / 据守、Combat、回收和致胜分限制。
         </p>
       </section>
     </main>
@@ -461,6 +487,6 @@
       <p>卡牌训练场 · 为 GitHub Pages 准备的静态教学站</p>
     </footer>
 
-    <script src="./app.js?v=10"></script>
+    <script src="./app.js?v=12"></script>
   </body>
 </html>

@@ -1,31 +1,45 @@
 const missions = [
   {
     tag: "任务 01",
-    title: "选你的冠军",
+    title: "认识你的卡牌",
     copy:
-      "你的传奇冠军决定整套牌的颜色和打法。先别急着背全部规则，先回答一个问题：你想快攻、铺场，还是靠一个关键角色到处支援？",
-    cards: ["Champion", "Unit", "Spell"],
+      "先把桌面搭出来：选定英雄是可以按规则打出的“身子”，传奇是提供符文特性和技能的“头”，主牌堆、符文牌堆、废牌堆各自分开放。",
+    cards: ["选定英雄", "传奇", "主牌堆"],
   },
   {
     tag: "任务 02",
-    title: "用符文付款",
+    title: "回合开始",
     copy:
-      "符文来自独立的 12 张符文牌堆。召出后它们在基地里，横置自己的获得资源技能来支付费用；横置后本回合不能再用同一张符文。",
-    cards: ["符文牌堆", "活跃符文", "横置支付"],
+      "你的回合先唤醒：横放的单位和符文正放。然后据守已控制战场，再从 12 张符文牌堆召出 2 张符文，抽 1 张牌并清空符文池。",
+    cards: ["唤醒", "据守", "召出符文"],
   },
   {
     tag: "任务 03",
-    title: "派单位上战场",
+    title: "占领=得分",
     copy:
-      "单位默认以休眠状态进场，不能立刻支付标准移动费用。到你的开始阶段激活后，才能休眠它并从基地移动到战场。",
-    cards: ["休眠进场", "激活", "标准移动"],
+      "单位默认休眠进基地。下一回合变活跃后，标准移动要横置它作为费用；进入你不控制的战场后，法术对决结束再确立控制并征服得分。",
+    cards: ["休眠进场", "标准移动", "征服"],
   },
   {
     tag: "任务 04",
-    title: "抢到 8 分",
+    title: "战斗对决",
     copy:
-      "得分主要来自两种方式：通过争夺建立战场控制叫 Conquer；开始阶段继续控制战场叫 Hold。1v1 通常先到 8 分获胜。",
-    cards: ["Conquer", "Hold", "Win"],
+      "敌方单位进入你控制的战场会待发生战斗。战斗先开法术对决，迅捷和反应可以在开环行动；有结算链时只剩反应能响应。",
+    cards: ["进攻方", "迅捷", "反应"],
+  },
+  {
+    tag: "任务 05",
+    title: "据守再得分",
+    copy:
+      "如果下个自己的开始阶段仍控制某战场，就通过据守得 1 分。每回合每个战场最多给同一玩家 1 分。",
+    cards: ["控制", "开始阶段", "据守"],
+  },
+  {
+    tag: "任务 06",
+    title: "夺取最终胜利",
+    copy:
+      "1v1 到 8 分获胜。最后一分要注意：据守可以直接赢；征服拿最后一分时，本回合需要每个战场都得过分，否则改为抽 1 张牌。",
+    cards: ["7 / 8", "致胜分", "获胜"],
   },
 ];
 
@@ -112,7 +126,7 @@ const practiceCards = [
     name: "精准指令",
     cost: 1,
     speed: "swift",
-    text: "迅捷练习牌。法术对决开环时才演示。",
+    text: "迅捷练习牌。法术对决开环时打出。",
   },
 ];
 
@@ -177,6 +191,23 @@ function readyAllControlledObjects() {
   refreshAvailableRunes();
 }
 
+function recyclePlayerRunes(count) {
+  let remaining = count;
+  const keptRunes = [];
+
+  practice.playerRunes.forEach((rune) => {
+    if (remaining > 0 && rune.state === "rested") {
+      remaining -= 1;
+      practice.playerRuneDeck += 1;
+      return;
+    }
+    keptRunes.push(rune);
+  });
+
+  practice.playerRunes = keptRunes;
+  refreshAvailableRunes();
+}
+
 let practice = structuredClone(initialPractice);
 let practiceHistory = [];
 
@@ -191,6 +222,7 @@ const practiceHand = document.querySelector("#practice-hand");
 const practiceLog = document.querySelector("#practice-log");
 const playerBench = document.querySelector("#player-bench");
 const enemyCard = document.querySelector("#enemy-card");
+const scoreMarkers = document.querySelectorAll(".score-track [data-score]");
 const zoneCounters = {
   playerMainDeck: document.querySelector("#player-main-deck"),
   playerRuneDeck: document.querySelector("#player-rune-deck"),
@@ -237,6 +269,9 @@ function renderPractice() {
   playerBench.textContent = practice.bench;
   playerBench.className = `bench ${practice.benchState}`;
   enemyCard.classList.toggle("hidden", !practice.enemyVisible);
+  scoreMarkers.forEach((marker) => {
+    marker.classList.toggle("earned", Number(marker.dataset.score) <= practice.score);
+  });
   zoneCounters.playerMainDeck.textContent = `主牌堆 ${practice.playerMainDeck}`;
   zoneCounters.playerRuneDeck.textContent = `符文牌堆 ${practice.playerRuneDeck}`;
   zoneCounters.playerDiscard.textContent = `废牌堆 ${practice.playerDiscard}`;
@@ -259,7 +294,7 @@ function renderPractice() {
   practiceHand.innerHTML = practice.hand
     .map(
       (card) => `
-        <button class="hand-card ${card.speed || ""}" data-card="${card.id}" ${practice.step !== 4 ? "disabled" : ""}>
+        <button class="hand-card ${card.speed || ""}" data-card="${card.id}" ${canPlayPracticeCard(card.id) ? "" : "disabled"}>
           ${card.name}
           <span>费用 ${card.cost} · ${card.text}</span>
         </button>
@@ -268,6 +303,16 @@ function renderPractice() {
     .join("");
 
   practiceLog.innerHTML = practice.log.map((item) => `<li>${item}</li>`).join("");
+}
+
+function canPlayPracticeCard(cardId) {
+  if (cardId === "scout") {
+    return practice.step === 4 && practice.benchState !== "rested";
+  }
+  if (cardId === "trick") {
+    return practice.step === 14;
+  }
+  return false;
 }
 
 function advancePractice() {
@@ -303,7 +348,7 @@ function advancePractice() {
     practice.playerRunes = makeRunes("player", 2);
     refreshAvailableRunes();
     practice.primary = "等待出牌";
-    practice.coach = "召出阶段从符文牌堆召出 2 张符文，它们以活跃状态在基地里。点击手牌里的“皮城侦察兵”，会横置 1 张符文支付费用。";
+    practice.coach = "召出阶段从符文牌堆顶部召出 2 张符文，放进基地并保持活跃。点击手牌里的“皮城侦察兵”，会横置 1 张符文支付费用。";
     addPracticeLog("召出：从 12 张符文牌堆召出 2 张符文，放入基地并保持活跃。");
   } else if (practice.step === 4) {
     practice.step = 5;
@@ -391,52 +436,82 @@ function advancePractice() {
   } else if (practice.step === 13) {
     practice.step = 14;
     practice.phase = "战斗";
-    practice.primary = "迅捷窗口让过";
-    practice.coach = "战斗先进入战斗法术对决。令战场进入争夺的对手是进攻方，并先获得焦点；在这个开环窗口，迅捷与反应都可以用。";
-    addPracticeLog("战斗法术对决：确定进攻方与防守方。");
+    practice.primary = "等待迅捷法术";
+    practice.coach = "战斗先进入战斗法术对决。令战场进入争夺的对手是进攻方，并先获得焦点；焦点传给你时，点击手牌里的“精准指令”练习迅捷窗口。";
+    addPracticeLog("战斗法术对决：确定进攻方与防守方，进攻方先获得焦点。");
   } else if (practice.step === 14) {
-    practice.step = 15;
-    practice.phase = "结算链";
-    practice.primary = "反应窗口让过";
-    practice.coach = "假设对手打出一张迅捷法术，它进入结算链。此时从法术对决开环变成法术对决闭环，只有反应能继续响应；普通法术和标准移动都不能插进来。";
-    addPracticeLog("时机：迅捷法术创建结算链；闭环状态只允许反应。");
+    practice.coach = "先点击手牌里的“精准指令”。迅捷法术要在法术对决开环、有焦点时打出；它进入结算链后才会变成闭环。";
   } else if (practice.step === 15) {
     practice.step = 16;
     practice.phase = "伤害";
     practice.primary = "判定结果";
+    practice.playerDiscard += 1;
     practice.coach = "双方各有 2 点战力，互相分配 2 点战斗伤害，然后同时造成。";
+    addPracticeLog("结算：精准指令结算完毕，放入你的废牌堆。");
     addPracticeLog("战斗伤害：双方各分配并造成 2 点伤害。");
   } else if (practice.step === 16) {
     practice.step = 17;
     practice.phase = "结算";
-    practice.primary = "完成练习";
+    practice.primary = "练习回收";
     practice.sites.bridge = {
       text: "无单位",
       state: "",
       status: "开放 · 未受控制",
     };
-    practice.playerDiscard = 1;
-    practice.opponentDiscard = 1;
+    practice.playerDiscard += 1;
+    practice.opponentDiscard += 1;
     practice.coach = "双方单位都受到致命伤害，没有单位存活，所以战斗无结果，战场变为未受控制。";
     addPracticeLog("战斗结果：双方都没有单位存活，战斗无结果，战场未受控制。");
+  } else if (practice.step === 17) {
+    practice.step = 18;
+    practice.phase = "回收";
+    practice.primary = "模拟最后一分";
+    recyclePlayerRunes(1);
+    practice.coach = "回收不是进废牌堆。这里把 1 张已横置符文作为示例回收到符文牌堆底：符文区减少 1，符文牌堆增加 1。";
+    addPracticeLog("回收：1 张休眠符文回到符文牌堆底。");
+  } else if (practice.step === 18) {
+    practice.step = 19;
+    practice.phase = "最终胜利";
+    practice.primary = "完成练习";
+    practice.score = 7;
+    practice.sites.arena = {
+      text: "友方单位 2 力 · 活跃",
+      state: "controlled",
+      status: "被占领 · 控制者：你",
+    };
+    practice.sites.bridge = {
+      text: "友方单位 2 力 · 活跃",
+      state: "controlled",
+      status: "被占领 · 控制者：你",
+    };
+    practice.coach = "假设你已经 7 / 8，并同时控制两个战场。下一次开始阶段通过据守得分时，可以直接拿到致胜分。若靠征服拿最后一分，则本回合必须每个战场都得过分，否则改为抽 1 张牌。";
+    addPracticeLog("致胜分：据守可直接拿最后一分；征服最后一分有额外条件。");
   } else {
+    practice.step = 20;
     practice.phase = "完成";
     practice.primary = "再打一把";
-    practice.coach = "你已经跑完投骰、抽战场、召出符文、横置支付、休眠进场、激活后标准移动、迅捷/反应窗口、征服、据守和一次战斗。现在可以重开再熟一遍。";
+    practice.score = 8;
+    practice.coach = "你已经跑完投骰、抽战场、召出符文、横置支付、休眠进场、激活后标准移动、迅捷/反应窗口、征服、据守、战斗、回收和最后一分。现在可以重开再熟一遍。";
     addPracticeLog("练习完成：对局核心骨架已经跑通。");
-    practice.step = 0;
   }
 
   renderPractice();
 }
 
 function playPracticeCard(cardId) {
-  if (practice.step !== 4) {
+  if (!canPlayPracticeCard(cardId)) {
     return;
   }
 
-  if (cardId !== "scout") {
-    practice.coach = "这张牌先留着。现在要练的是打出单位、横置符文付款，并确认单位休眠进场。";
+  if (cardId === "trick") {
+    savePractice();
+    restPlayerRunes(1);
+    practice.hand = practice.hand.filter((card) => card.id !== cardId);
+    practice.step = 15;
+    practice.phase = "结算链";
+    practice.primary = "反应窗口让过";
+    practice.coach = "你在法术对决开环打出迅捷法术，并横置 1 张符文支付费用。法术进入结算链后变成法术对决闭环，此时只有反应能继续响应；双方让过后按后进先出结算，法术进废牌堆。";
+    addPracticeLog("迅捷：打出精准指令，横置 1 张符文支付；进入闭环后只剩反应可响应。");
     renderPractice();
     return;
   }
@@ -454,8 +529,19 @@ function playPracticeCard(cardId) {
 }
 
 practicePrimary.addEventListener("click", () => {
+  if (practice.step === 20) {
+    practice = structuredClone(initialPractice);
+    practiceHistory = [];
+    renderPractice();
+    return;
+  }
   if (practice.step === 4 && practice.benchState !== "rested") {
     practice.coach = "先从手牌打出“皮城侦察兵”，再继续。";
+    renderPractice();
+    return;
+  }
+  if (practice.step === 14) {
+    practice.coach = "这里要实际练一次时机窗口：请点击手牌里的“精准指令”，它是迅捷法术。";
     renderPractice();
     return;
   }

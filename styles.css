@@ -555,6 +555,12 @@ h2 {
   line-height: 1;
 }
 
+.score-track span.earned {
+  border-color: rgba(215, 174, 85, 0.92);
+  background: #d7ae55;
+  color: #17120d;
+}
+
 .score-track strong {
   border-color: rgba(98, 216, 207, 0.65);
   background: #0f2531;
@@ -1161,7 +1167,11 @@ h2 {
 
   .physical-playmat {
     grid-template-columns: 2.6rem repeat(6, minmax(0, 1fr));
-    grid-template-rows: auto auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto auto;
+  }
+
+  .score-track {
+    grid-row: 1 / 7;
   }
 
   .table-battlefields {
@@ -1211,7 +1221,7 @@ h2 {
 
   .player-hand-strip {
     grid-column: 2 / 8;
-    grid-row: 5;
+    grid-row: 6;
   }
 
   .coach-panel,
