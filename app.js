@@ -239,13 +239,13 @@ function renderPractice() {
   enemyCard.classList.toggle("hidden", !practice.enemyVisible);
   zoneCounters.playerMainDeck.textContent = `主牌堆 ${practice.playerMainDeck}`;
   zoneCounters.playerRuneDeck.textContent = `符文牌堆 ${practice.playerRuneDeck}`;
-  zoneCounters.playerDiscard.textContent = `弃牌堆 ${practice.playerDiscard}`;
+  zoneCounters.playerDiscard.textContent = `废牌堆 ${practice.playerDiscard}`;
   zoneCounters.playerBanish.textContent = `放逐区 ${practice.playerBanish}`;
   zoneCounters.playerHandCount.textContent = `手牌 ${practice.hand.length + practice.playerHandCountOverride}`;
   zoneCounters.playerRuneBank.innerHTML = renderRuneBank(practice.playerRunes, "你的符文");
   zoneCounters.opponentMainDeck.textContent = `主牌堆 ${practice.opponentMainDeck}`;
   zoneCounters.opponentRuneDeck.textContent = `符文牌堆 ${practice.opponentRuneDeck}`;
-  zoneCounters.opponentDiscard.textContent = `弃牌堆 ${practice.opponentDiscard}`;
+  zoneCounters.opponentDiscard.textContent = `废牌堆 ${practice.opponentDiscard}`;
   zoneCounters.opponentBanish.textContent = `放逐区 ${practice.opponentBanish}`;
   zoneCounters.opponentHandCount.textContent = `手牌 ${practice.opponentHand}`;
   zoneCounters.opponentRuneBank.innerHTML = renderRuneBank(practice.opponentRunes, "对手符文");

@@ -573,12 +573,12 @@ h2 {
 }
 
 .player-legend-slot {
-  grid-column: 4 / 6;
+  grid-column: 3 / 5;
   grid-row: 2;
 }
 
 .player-base-slot {
-  grid-column: 6 / 11;
+  grid-column: 5 / 11;
   grid-row: 2;
 }
 
