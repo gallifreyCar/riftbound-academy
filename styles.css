@@ -432,7 +432,8 @@ h2 {
 
 .practice-table {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr) 300px;
+  grid-template-columns: 260px minmax(720px, 1fr);
+  grid-template-rows: auto auto;
   min-height: 560px;
 }
 
@@ -443,11 +444,21 @@ h2 {
 }
 
 .coach-panel {
+  grid-column: 1;
+  grid-row: 1 / 3;
   border-right: 1px solid var(--line);
 }
 
 .hand-panel {
-  border-left: 1px solid var(--line);
+  grid-column: 2;
+  grid-row: 2;
+  border-top: 1px solid var(--line);
+  border-left: 0;
+}
+
+.practice-board {
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .coach-panel h3,
@@ -508,66 +519,102 @@ h2 {
   background-size: 34px 34px, 34px 34px, auto;
 }
 
-.table-player {
+.physical-playmat {
   display: grid;
+  grid-template-columns: 3rem repeat(12, minmax(0, 1fr));
+  grid-template-rows: minmax(190px, auto) minmax(130px, auto) minmax(130px, auto) auto;
   gap: 0.7rem;
+  min-height: 540px;
   padding: 0.8rem;
-  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(rgba(8, 16, 18, 0.08), rgba(8, 16, 18, 0.08)),
+    #d8c39d;
+  color: #322414;
 }
 
-.player-mat {
-  border-bottom: 0;
-}
-
-.opponent-mat {
-  background: rgba(227, 93, 84, 0.035);
-}
-
-.player-mat {
-  background: rgba(98, 216, 207, 0.04);
-}
-
-.table-row-zones {
+.score-track {
+  grid-column: 1;
+  grid-row: 1 / 5;
   display: grid;
-  grid-template-columns: repeat(4, minmax(82px, 1fr));
-  gap: 0.55rem;
-  align-items: stretch;
+  align-content: center;
+  justify-items: center;
+  gap: 0.4rem;
 }
 
-.opponent-mat .table-row-zones {
-  grid-template-columns: repeat(4, minmax(82px, 1fr));
+.score-track span,
+.score-track strong {
+  display: grid;
+  width: 2.15rem;
+  height: 2.15rem;
+  place-items: center;
+  border: 2px solid rgba(50, 36, 20, 0.62);
+  border-radius: 50%;
+  background: rgba(245, 241, 232, 0.26);
+  color: #322414;
+  font-weight: 900;
+  line-height: 1;
 }
 
-.opponent-mat .legend-zone {
-  order: 1;
+.score-track strong {
+  border-color: rgba(98, 216, 207, 0.65);
+  background: #0f2531;
+  color: var(--cyan);
+  font-size: 0.76rem;
 }
 
-.opponent-mat .hero-zone {
-  order: 2;
+.table-battlefields {
+  grid-column: 2 / 14;
+  grid-row: 1;
 }
 
-.opponent-mat .base-zone {
-  order: 3;
+.player-hero-slot {
+  grid-column: 2 / 4;
+  grid-row: 2;
 }
 
-.opponent-mat .rune-play-zone {
-  order: 4;
+.player-legend-slot {
+  grid-column: 4 / 6;
+  grid-row: 2;
 }
 
-.opponent-mat .rune-deck-zone {
-  order: 5;
+.player-base-slot {
+  grid-column: 6 / 11;
+  grid-row: 2;
 }
 
-.opponent-mat .banish-zone {
-  order: 6;
+.player-main-slot {
+  grid-column: 11 / 13;
+  grid-row: 2;
 }
 
-.opponent-mat .discard-zone {
-  order: 7;
+.player-rune-deck-slot {
+  grid-column: 2 / 4;
+  grid-row: 3;
 }
 
-.opponent-mat .deck-zone {
-  order: 8;
+.player-rune-bank-slot {
+  grid-column: 4 / 9;
+  grid-row: 3;
+}
+
+.player-discard-slot {
+  grid-column: 9 / 11;
+  grid-row: 3;
+}
+
+.player-banish-slot {
+  grid-column: 11 / 13;
+  grid-row: 3;
+}
+
+.player-hand-strip {
+  grid-column: 2 / 14;
+  grid-row: 4;
+  justify-self: stretch;
+}
+
+.opponent-counters {
+  display: none;
 }
 
 .table-zone,
@@ -579,9 +626,9 @@ h2 {
   gap: 0.2rem;
   min-height: calc(var(--physical-card-height) + 2.75rem);
   padding: 0.55rem;
-  border: 1px solid rgba(245, 241, 232, 0.14);
-  background: rgba(245, 241, 232, 0.045);
-  color: var(--muted);
+  border: 2px solid rgba(50, 36, 20, 0.42);
+  background: rgba(248, 229, 189, 0.18);
+  color: rgba(50, 36, 20, 0.76);
   font-weight: 800;
 }
 
@@ -589,14 +636,14 @@ h2 {
 .table-zone small,
 .rune-play-zone span {
   display: block;
-  color: var(--muted);
+  color: rgba(50, 36, 20, 0.72);
   font-size: 0.72rem;
 }
 
 .table-zone strong,
 .rune-play-zone strong {
   display: block;
-  color: var(--text);
+  color: #322414;
   font-size: 0.86rem;
   line-height: 1.2;
 }
@@ -685,6 +732,19 @@ h2 {
   align-content: start;
 }
 
+.base-zone {
+  align-content: start;
+}
+
+.base-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: var(--physical-card-height);
+}
+
 .rune-row {
   display: flex;
   flex-wrap: wrap;
@@ -725,23 +785,28 @@ h2 {
 .battlefield-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
 }
 
 .practice-site {
   display: grid;
   align-content: start;
-  gap: 0.8rem;
-  min-height: 210px;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 0.7rem;
+  min-height: 190px;
   padding: 0.9rem;
-  border-right: 1px solid var(--line);
-  background: rgba(98, 216, 207, 0.05);
+  border: 2px solid rgba(50, 36, 20, 0.5);
+  background: rgba(248, 229, 189, 0.2);
 }
 
 .practice-site:last-child {
-  border-right: 0;
+  border-right: 2px solid rgba(50, 36, 20, 0.5);
 }
 
 .site-header {
+  grid-column: 1;
+  grid-row: 1 / 3;
   gap: 0.15rem;
   background: linear-gradient(145deg, rgba(215, 174, 85, 0.9), rgba(98, 216, 207, 0.56));
   color: #081012;
@@ -760,11 +825,20 @@ h2 {
 }
 
 .site-state {
+  grid-column: 2;
+  grid-row: 1;
   min-height: 2rem;
   padding: 0.35rem 0.55rem;
-  border: 1px solid rgba(215, 174, 85, 0.26);
-  background: rgba(215, 174, 85, 0.08);
-  color: var(--gold);
+  border: 1px solid rgba(50, 36, 20, 0.28);
+  background: rgba(50, 36, 20, 0.06);
+  color: #5c411f;
+}
+
+.site-slot {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
+  align-self: start;
 }
 
 .site-slot,
@@ -1081,10 +1155,63 @@ h2 {
   .timing-grid,
   .battlefield-zone,
   .practice-topline,
-  .battlefield-row,
-  .table-row-zones,
-  .opponent-mat .table-row-zones {
+  .battlefield-row {
     grid-template-columns: 1fr;
+  }
+
+  .physical-playmat {
+    grid-template-columns: 2.6rem repeat(6, minmax(0, 1fr));
+    grid-template-rows: auto auto auto auto auto;
+  }
+
+  .table-battlefields {
+    grid-column: 2 / 8;
+    grid-row: 1;
+  }
+
+  .player-hero-slot {
+    grid-column: 2 / 4;
+    grid-row: 2;
+  }
+
+  .player-legend-slot {
+    grid-column: 4 / 6;
+    grid-row: 2;
+  }
+
+  .player-base-slot {
+    grid-column: 2 / 8;
+    grid-row: 3;
+  }
+
+  .player-main-slot {
+    grid-column: 6 / 8;
+    grid-row: 2;
+  }
+
+  .player-rune-deck-slot {
+    grid-column: 2 / 4;
+    grid-row: 4;
+  }
+
+  .player-rune-bank-slot {
+    grid-column: 4 / 8;
+    grid-row: 4;
+  }
+
+  .player-discard-slot {
+    grid-column: 2 / 4;
+    grid-row: 5;
+  }
+
+  .player-banish-slot {
+    grid-column: 4 / 6;
+    grid-row: 5;
+  }
+
+  .player-hand-strip {
+    grid-column: 2 / 8;
+    grid-row: 5;
   }
 
   .coach-panel,

@@ -163,30 +163,17 @@
               </div>
             </section>
 
-            <section class="practice-board tabletop-board" aria-label="线下牌桌练习区域">
-              <div class="table-player opponent-mat" aria-label="对手牌桌">
-                <div class="table-row table-row-zones">
-                  <div class="table-zone deck-zone" id="opponent-main-deck">主牌堆 40</div>
-                  <div class="table-zone pile-zone discard-zone" id="opponent-discard">弃牌堆 0</div>
-                  <div class="table-zone pile-zone banish-zone" id="opponent-banish">放逐区 0</div>
-                  <div class="table-zone rune-deck-zone" id="opponent-rune-deck">符文牌堆 12</div>
-                  <div class="table-zone rune-play-zone" id="opponent-rune-bank">符文区 0</div>
-                  <div class="table-zone base-zone">
-                    <span>基地</span>
-                    <div class="table-card enemy-card hidden" id="enemy-card">敌方单位 2 力</div>
-                  </div>
-                  <div class="table-zone legend-zone" data-card-label="亚索传奇">
-                    <span>传奇</span>
-                    <strong>亚索传奇</strong>
-                    <small>头：符文特性与被动/主动</small>
-                  </div>
-                  <div class="table-zone hero-zone" data-card-label="亚索">
-                    <span>英雄</span>
-                    <strong>亚索 - 选定英雄</strong>
-                    <small>身子：同名英雄单位牌</small>
-                  </div>
-                </div>
-                <div class="hand-strip opponent-hand-strip" id="opponent-hand-count">对手手牌 0</div>
+            <section class="practice-board tabletop-board physical-playmat" aria-label="线下牌桌练习区域">
+              <div class="score-track" aria-label="分数轨">
+                <span>8</span>
+                <span>7</span>
+                <span>6</span>
+                <span>5</span>
+                <span>4</span>
+                <span>3</span>
+                <span>2</span>
+                <span>1</span>
+                <strong>你</strong>
               </div>
 
               <div class="battlefield-row table-battlefields" aria-label="战场区域">
@@ -210,29 +197,37 @@
                 </div>
               </div>
 
-              <div class="table-player player-mat" aria-label="你的牌桌">
-                <div class="table-row table-row-zones">
-                  <div class="table-zone deck-zone" id="player-main-deck">主牌堆 40</div>
-                  <div class="table-zone pile-zone discard-zone" id="player-discard">弃牌堆 0</div>
-                  <div class="table-zone pile-zone banish-zone" id="player-banish">放逐区 0</div>
-                  <div class="table-zone rune-deck-zone" id="player-rune-deck">符文牌堆 12</div>
-                  <div class="table-zone rune-play-zone" id="player-rune-bank">符文区 0</div>
-                  <div class="table-zone base-zone">
-                    <span>基地</span>
-                    <div class="bench" id="player-bench">等待发牌</div>
-                  </div>
-                  <div class="table-zone legend-zone" data-card-label="金克丝传奇">
-                    <span>传奇</span>
-                    <strong>金克丝传奇</strong>
-                    <small>头：符文特性与被动/主动</small>
-                  </div>
-                  <div class="table-zone hero-zone" data-card-label="金克丝">
-                    <span>英雄</span>
-                    <strong>金克丝 - 反抗者</strong>
-                    <small>身子：同名英雄单位牌</small>
-                  </div>
+              <div class="table-zone hero-zone player-hero-slot" data-card-label="金克丝">
+                <span>选定英雄</span>
+                <strong>金克丝 - 反抗者</strong>
+                <small>身子：同名英雄单位牌</small>
+              </div>
+              <div class="table-zone legend-zone player-legend-slot" data-card-label="金克丝传奇">
+                <span>传奇</span>
+                <strong>金克丝传奇</strong>
+                <small>头：符文特性与被动/主动</small>
+              </div>
+              <div class="table-zone base-zone player-base-slot">
+                <span>基地</span>
+                <div class="base-cards">
+                  <div class="bench" id="player-bench">等待发牌</div>
+                  <div class="table-card enemy-card hidden" id="enemy-card">敌方单位 2 力</div>
                 </div>
-                <div class="hand-strip player-hand-strip" id="player-hand-count">你的手牌 0</div>
+              </div>
+              <div class="table-zone deck-zone player-main-slot" id="player-main-deck">主牌堆 40</div>
+              <div class="table-zone rune-deck-zone player-rune-deck-slot" id="player-rune-deck">符文牌堆 12</div>
+              <div class="table-zone rune-play-zone player-rune-bank-slot" id="player-rune-bank">符文区 0</div>
+              <div class="table-zone pile-zone discard-zone player-discard-slot" id="player-discard">弃牌堆 0</div>
+              <div class="table-zone pile-zone banish-zone player-banish-slot" id="player-banish">放逐区 0</div>
+              <div class="hand-strip player-hand-strip" id="player-hand-count">你的手牌 0</div>
+
+              <div class="opponent-counters" aria-hidden="true">
+                <div id="opponent-main-deck">主牌堆 40</div>
+                <div id="opponent-rune-deck">符文牌堆 12</div>
+                <div id="opponent-discard">弃牌堆 0</div>
+                <div id="opponent-banish">放逐区 0</div>
+                <div id="opponent-rune-bank">符文区 0</div>
+                <div id="opponent-hand-count">手牌 0</div>
               </div>
             </section>
 
