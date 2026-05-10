@@ -9,7 +9,7 @@
       content="像游戏新手教程一样学习英雄联盟卡牌游戏 Riftbound / 符文战场。"
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=13" />
+    <link rel="stylesheet" href="./styles.css?v=14" />
   </head>
   <body>
     <header class="topbar">
@@ -183,6 +183,31 @@
                 <strong>你</strong>
               </div>
 
+              <div class="opponent-mat" aria-label="对手镜像区域">
+                <div class="hand-strip opponent-hand-strip" id="opponent-hand-count">对手手牌 0</div>
+                <div class="table-zone hero-zone opponent-hero-slot" data-card-label="亚索">
+                  <span>对手选定英雄</span>
+                  <strong>亚索 - 不羁之风</strong>
+                  <small>身子：同名英雄单位牌</small>
+                </div>
+                <div class="table-zone legend-zone opponent-legend-slot" data-card-label="亚索传奇">
+                  <span>对手传奇</span>
+                  <strong>亚索传奇</strong>
+                  <small>头：符文特性与效果</small>
+                </div>
+                <div class="table-zone base-zone opponent-base-slot">
+                  <span>对手基地</span>
+                  <div class="base-cards">
+                    <div class="bench opponent-ready" id="opponent-bench">等待行动</div>
+                  </div>
+                </div>
+                <div class="table-zone deck-zone opponent-main-slot" id="opponent-main-deck">主牌堆 40</div>
+                <div class="table-zone rune-deck-zone opponent-rune-deck-slot" id="opponent-rune-deck">符文牌堆 12</div>
+                <div class="table-zone rune-play-zone opponent-rune-bank-slot" id="opponent-rune-bank">符文区 0</div>
+                <div class="table-zone pile-zone discard-zone opponent-discard-slot" id="opponent-discard">废牌堆 0</div>
+                <div class="table-zone pile-zone banish-zone opponent-banish-slot" id="opponent-banish">放逐区 0</div>
+              </div>
+
               <div class="battlefield-row table-battlefields" aria-label="战场区域">
                 <div class="practice-site" data-site="arena">
                   <div class="site-header">
@@ -218,7 +243,6 @@
                 <span>基地</span>
                 <div class="base-cards">
                   <div class="bench" id="player-bench">等待发牌</div>
-                  <div class="table-card enemy-card hidden" id="enemy-card">敌方单位 2 力</div>
                 </div>
               </div>
               <div class="table-zone deck-zone player-main-slot" id="player-main-deck">主牌堆 40</div>
@@ -228,14 +252,6 @@
               <div class="table-zone pile-zone banish-zone player-banish-slot" id="player-banish">放逐区 0</div>
               <div class="hand-strip player-hand-strip" id="player-hand-count">你的手牌 0</div>
 
-              <div class="opponent-counters" aria-hidden="true">
-                <div id="opponent-main-deck">主牌堆 40</div>
-                <div id="opponent-rune-deck">符文牌堆 12</div>
-                <div id="opponent-discard">废牌堆 0</div>
-                <div id="opponent-banish">放逐区 0</div>
-                <div id="opponent-rune-bank">符文区 0</div>
-                <div id="opponent-hand-count">手牌 0</div>
-              </div>
             </section>
 
             <aside class="hand-panel" aria-labelledby="hand-title">
@@ -296,6 +312,7 @@
             <ul>
               <li>单位默认以休眠状态进场，横置表示；有急速等效果才可能改变进场状态。</li>
               <li>标准移动的费用是让该单位休眠，所以已经休眠的单位不能支付这项费用。</li>
+              <li>单位也可以直接打出到你的基地，或打出到你已经控制的战场；无论放在哪里，默认仍以休眠状态进场。</li>
               <li>你的开始阶段会将你控制的非法术游戏物体激活，也就是正放。</li>
               <li>符文使用其获得资源技能时也会横置；横置符文不能再次横置支付。</li>
             </ul>
@@ -315,7 +332,8 @@
             <ul>
               <li>被占领：战场上有单位。开放：未被占领且未受控制。</li>
               <li>争夺：不控制该战场的玩家让单位进入此处，直到对决或战斗后重新确立控制。</li>
-              <li>移动到开放战场通常开启非战斗法术对决；同一战场出现敌对单位会开启战斗。</li>
+              <li>移动到开放战场通常开启非战斗法术对决；同一战场出现敌对单位会进入战斗流程。</li>
+              <li>战斗后只剩一方单位时，该方赢得战斗并控制战场；双方都有或都没有单位时，战斗无结果。</li>
             </ul>
           </article>
           <article class="rule-card">
@@ -487,6 +505,6 @@
       <p>卡牌训练场 · 为 GitHub Pages 准备的静态教学站</p>
     </footer>
 
-    <script src="./app.js?v=13"></script>
+    <script src="./app.js?v=14"></script>
   </body>
 </html>
